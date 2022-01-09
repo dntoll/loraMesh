@@ -15,7 +15,7 @@ def mainLoopInThread(this, that):
 
         if this.pm.isPartOfANetwork():
             this.sendToAll()
-            time.sleep(10)
+            time.sleep(2)
         time.sleep(3)
 
 class App:
@@ -39,7 +39,7 @@ class App:
     def sendToAll(self):
         ips = self.pm.getAllIPs()
         for ip in ips:
-            self.pm.sendMessage(ip, "Hello from me " + str(self.pm.getMyAddress()))
+            self.pm.sendMessage(ip, "Hi! " + str(self.pm.getMyAddress()))
 
 a = App(pybytes)
 a.run()
