@@ -47,6 +47,9 @@ class PymeshAdapter:
         print(self.getAllIPs())
         print("ip_eid")
         print(self.pymesh.mesh.mesh.mesh.ip_eid)
+        print("pairs:")
+        mesh_pairs = self.pymesh.mesh.mesh.get_mesh_pairs()
+        print('last_mesh_pairs', mesh_pairs)
     
     def update(self):
         if not self.pymesh.is_connected():
