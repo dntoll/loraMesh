@@ -15,7 +15,7 @@ def mainLoopInThread(this, that):
 
         if this.pm.isPartOfANetwork():
             this.sendToAll()
-            time.sleep(2)
+            time.sleep(10)
         time.sleep(3)
 
 class App:

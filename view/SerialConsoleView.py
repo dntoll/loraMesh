@@ -24,7 +24,7 @@ class SerialConsoleView:
             (message))
     
     def isConnected(self, myAddress, otherNodesInNetwork):
-        print("Connected MACshort: %s Other Nodes In Network: %s" %
+        print("Connected MACshort: %s, Other Nodes In Network: %s" %
             (myAddress, str(otherNodesInNetwork)))
     
     def showIps(self, ips):

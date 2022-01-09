@@ -67,7 +67,7 @@ class PymeshAdapter:
         print("ip_eid:")
         print(self.pymesh.mesh.mesh.mesh.ip_eid)
         print("pairs:")
-        mesh_pairs = self.pymesh.mesh.mesh.get_mesh_pairs()
+        mesh_pairs = self.pymesh.mesh.get_mesh_pairs()
         print('last_mesh_pairs', mesh_pairs)
         print("Buffer info:", self.pymesh.mesh.mesh.mesh.mesh.cli("bufferinfo"))
     
@@ -78,9 +78,15 @@ class PymeshAdapter:
             self.view.isConnected(self.getMyAddress(), self.getAllIPs())
 
         #Too many messages sent and received... must reboot
-        if self.numMessages > 80:
+        
+        """print(self.numMessages)"""
+        if self.numMessages > 90:
             print("too many messages sent, reset")
+            self.numMessages = 0
             machine.reset()
+            #this did not work either
+            """self.pymesh.pause()
+            self.pymesh.resume()"""
 
 
     def sendMessage(self, target_ip, message):
