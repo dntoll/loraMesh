@@ -15,7 +15,7 @@ globalView = None
 
 class PymeshAdapter:
 
-    def __init__(self, pybytes, view):
+    def __init__(self, pybytes, view, pyMeshDebugLevel):
         global globalView
         globalView = view
         self.view = view
@@ -26,7 +26,7 @@ class PymeshAdapter:
         self.pymesh = pybytes.__pymesh.__pymesh
         self.pymesh.mesh.mesh.message_cb = PymeshAdapter.new_message_cb
         
-        #self.pymesh.debug_level(3)
+        self.pymesh.debug_level(pyMeshDebugLevel)
         view.donePymeshInit(self.getMyAddress())
         
     def getMyAddress(self):
@@ -45,7 +45,8 @@ class PymeshAdapter:
         print(self.pymesh.status_str())
         print("All ips")
         print(self.getAllIPs())
-        print(self.pymesh.mesh.mesh.mesh.mesh)
+        print("ip_eid")
+        print(self.pymesh.mesh.mesh.mesh.ip_eid)
     
     def update(self):
         if not self.pymesh.is_connected():
