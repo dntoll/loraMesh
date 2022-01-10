@@ -1,11 +1,16 @@
 
 import time
 import machine
+import sys
 
 try:
     from pymesh_config import PymeshConfig
 except:
-    from _pymesh_config import PymeshConfig
+    try:
+        from _pymesh_config import PymeshConfig
+    except:
+        print("pymesh not deployed, need to upgrade fw using pybytes online")
+        sys.exit()
 
 try:
     from pymesh import Pymesh
@@ -17,15 +22,16 @@ this = None
 
 class PymeshAdapter:
 
-    def __init__(self, pybytes, view, pyMeshDebugLevel):
+    def __init__(self, pybytes, view, pyMeshDebugLevel, messageCallback):
         global globalView
         global this
         globalView = view
         this = self
 
-        self.numMessages = 0;
+        self.numMessages = 0
         
         self.view = view
+        self.messageCallback = messageCallback
         
         # read config file, or set default values
         pymesh_config = PymeshConfig.read_config()
@@ -117,4 +123,6 @@ class PymeshAdapter:
         this.numMessages += 1
 
         globalView.receiveMessage(rcv_ip, rcv_data)
+
+        this.messageCallback(rcv_ip, rcv_data)
 

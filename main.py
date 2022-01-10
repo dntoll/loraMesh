@@ -8,15 +8,13 @@ from view.SerialConsoleView import SerialConsoleView
 from view.pybytesView import pybytesView
 
 def mainLoopInThread(this, that):
-
-    
     while True:
         this.pm.update()
 
-        if this.pm.isPartOfANetwork():
-            this.sendToAll()
-            time.sleep(10)
-        time.sleep(3)
+        """if this.pm.isPartOfANetwork():
+            this.sendToAll("Ping")
+            time.sleep(10)"""
+        time.sleep(20)
 
 class App:
     def __init__(self, pybytes):
@@ -26,7 +24,7 @@ class App:
         self.view.add(SerialConsoleView())
         self.view.add(pybytesView(pybytes))
 
-        self.pm = PymeshAdapter(pybytes, self.view, 0)
+        self.pm = PymeshAdapter(pybytes, self.view, 0, self.messageCallback)
 
     def run(self):
         #Want to run the loop in a separate thread to make sure we can interract with the app on this one
@@ -34,12 +32,20 @@ class App:
         
             #break
     
-    
+    def messageCallback(self, rcv_ip, rcv_dat):
+        message = rcv_dat.decode('utf-8')
+        print("Callback from %s: %s" % 
+            (rcv_ip, message))
+        if message == "Ping":
+            self.sendToAll("Pong")
 
-    def sendToAll(self):
+
+
+    def sendToAll(self, content):
         ips = self.pm.getAllIPs()
         for ip in ips:
-            self.pm.sendMessage(ip, "Hi! " + str(self.pm.getMyAddress()))
+            self.pm.sendMessage(ip, content)
 
+print("Release 1")
 a = App(pybytes)
 a.run()
