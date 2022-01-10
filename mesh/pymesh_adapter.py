@@ -1,26 +1,14 @@
 
 import time
-import machine
 import sys
-
-try:
-    from pymesh_config import PymeshConfig
-except:
-    try:
-        from _pymesh_config import PymeshConfig
-    except:
-        print("pymesh not deployed, need to upgrade fw using pybytes online")
-        sys.exit()
-
-try:
-    from pymesh import Pymesh
-except:
-    from _pymesh import Pymesh
-
-globalView = None
-this = None
+import socket
+import struct
+import _thread
+from network import LoRa
+from mesh import Message
 
 class PymeshAdapter:
+    ping = 1
 
     def __init__(self, pybytes, view, pyMeshDebugLevel, messageCallback):
         global globalView
@@ -28,28 +16,48 @@ class PymeshAdapter:
         globalView = view
         this = self
 
-        self.numMessages = 0
         
         self.view = view
         self.messageCallback = messageCallback
-        
-        # read config file, or set default values
-        pymesh_config = PymeshConfig.read_config()
-        #initialize Pymesh
-        self.pymesh = pybytes.__pymesh.__pymesh
-        self.pymesh.mesh.mesh.message_cb = PymeshAdapter.new_message_cb
-        
-        self.pymesh.debug_level(pyMeshDebugLevel)
-        view.donePymeshInit(self.getMyAddress())
+        self.lora = LoRa(mode=LoRa.LORA, tx_iq=True, region=LoRa.EU868)
+
+        self.rawMac = self.lora.mac()[7]
+
+        lora_sock = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
+        lora_sock.setblocking(True)
+
+        print("Starting threads")
+        self.listenThread = _thread.start_new_thread(PymeshAdapter.listen, (self, lora_sock))
+        self.sendThread = _thread.start_new_thread(PymeshAdapter.connect, (self, lora_sock))
+
+
+    def connect(this, lora_sock):
+        i = 0
+        while True:
+            m = Message(this.rawMac, this.ping, "Ping")
+            lora_sock.send(m.getBytes())
+            print('Sent {}'.format(m.getBytes()))
+            i= i+1
+            time.sleep(5)
+
+    def listen(this, lora_sock):
+        i = 0
+        while (True):
+            if lora_sock.recv(64) == b'Ping':
+                lora_sock.send('Pong')
+                print('Pong {}'.format(i))
+                i = i+1
+            time.sleep(5)
+
         
     def getMyAddress(self):
         #https://github.com/pycom/pycom-libraries/blob/master/pymesh/pymesh_frozen/lib/loramesh.py#L153
         
         #Note we go beyond the mesh_interface we should use to get this one
-        return self.pymesh.mesh.mesh.mesh.mac_short
+        return 1
     
     def isPartOfANetwork(self):
-        return self.pymesh.is_connected()
+        return False
 
 
     def stateToString(self, state):
@@ -63,56 +71,18 @@ class PymeshAdapter:
         return "STATE_UNKNOWN"
 
     def printDebug(self):
-        print("Role:" + self.stateToString(self.pymesh.mesh.mesh.mesh.mesh.state()))
-        print("Mac:")
-        print(self.pymesh.mac());
-        print("Status_str:")
-        print(self.pymesh.status_str())
-        print("All ips:")
-        print(self.getAllIPs())
-        print("ip_eid:")
-        print(self.pymesh.mesh.mesh.mesh.ip_eid)
-        print("pairs:")
-        mesh_pairs = self.pymesh.mesh.get_mesh_pairs()
-        print('last_mesh_pairs', mesh_pairs)
-        print("Buffer info:", self.pymesh.mesh.mesh.mesh.mesh.cli("bufferinfo"))
+        return
     
     def update(self):
-        if not self.pymesh.is_connected():
-            self.view.notConnected(self.pymesh.status_str())
-        else:
-            self.view.isConnected(self.getMyAddress(), self.getAllIPs())
-
-        #Too many messages sent and received... must reboot
-        
-        """print(self.numMessages)"""
-        if self.numMessages > 90:
-            print("too many messages sent, reset")
-            self.numMessages = 0
-            machine.reset()
-            #this did not work either
-            """self.pymesh.pause()
-            self.pymesh.resume()"""
+        return
 
 
     def sendMessage(self, target_ip, message):
         self.view.sendMessage(target_ip, message)
-        self.pymesh.send_mess(target_ip, message)
-
-        self.numMessages += 1
-        ##We seem to eat up memory, perhaps the socket needs closing at differnt points...
-        #hm did not seem to make any difference... 
-        #self.pymesh.mesh.mesh.sock.close()
-        #self.pymesh.mesh.mesh.create_socket()
+        
 
     def getAllIPs(self):
-        ipsIncludingMine = self.pymesh.mesh.get_mesh_mac_list()
-        
-        if len(ipsIncludingMine) > 0:
-            excludingMine = ipsIncludingMine[0]
-            if self.getMyAddress() in excludingMine:
-                excludingMine.remove(self.getMyAddress())
-            return excludingMine
+       
         return []
         
 
