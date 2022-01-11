@@ -1,51 +1,14 @@
-import time
-import _thread
+import pycom
 
-from mesh.pymesh_adapter import PymeshAdapter
-from view.CompositeView import CompositeView
-from view.RGBView import RGBView
-from view.SerialConsoleView import SerialConsoleView
-from view.pybytesView import pybytesView
+pycom.pybytes_on_boot(False)
 
-def mainLoopInThread(this, that):
-    while True:
-        this.pm.update()
-
-        """if this.pm.isPartOfANetwork():
-            this.sendToAll("Ping")
-            time.sleep(10)"""
-        time.sleep(20)
-
-class App:
-    def __init__(self, pybytes):
-        
-        self.view = CompositeView()
-        self.view.add(RGBView())
-        self.view.add(SerialConsoleView())
-        self.view.add(pybytesView(pybytes))
-
-        self.pm = PymeshAdapter(pybytes, self.view, 0, self.messageCallback)
-
-    def run(self):
-        #Want to run the loop in a separate thread to make sure we can interract with the app on this one
-        _thread.start_new_thread(mainLoopInThread, (self, self))
-        
-            #break
-    
-    def messageCallback(self, rcv_ip, rcv_dat):
-        message = rcv_dat.decode('utf-8')
-        print("Callback from %s: %s" % 
-            (rcv_ip, message))
-        if message == "Ping":
-            self.sendToAll("Pong")
-
-
-
-    def sendToAll(self, content):
-        ips = self.pm.getAllIPs()
-        for ip in ips:
-            self.pm.sendMessage(ip, content)
+from AppController import AppController
+from mesh.Message import Message
 
 print("Release 1")
-a = App(pybytes)
+
+Message.test()
+
+a = AppController()
 a.run()
+

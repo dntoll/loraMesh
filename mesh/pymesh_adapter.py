@@ -1,16 +1,18 @@
 
+from machine import Timer
 import time
 import sys
 import socket
 import struct
+import machine
 import _thread
 from network import LoRa
-from mesh import Message
+from mesh.Message import Message
 
 class PymeshAdapter:
     ping = 1
 
-    def __init__(self, pybytes, view, pyMeshDebugLevel, messageCallback):
+    def __init__(self, view, messageCallback):
         global globalView
         global this
         globalView = view
@@ -27,27 +29,46 @@ class PymeshAdapter:
         lora_sock.setblocking(True)
 
         print("Starting threads")
-        self.listenThread = _thread.start_new_thread(PymeshAdapter.listen, (self, lora_sock))
-        self.sendThread = _thread.start_new_thread(PymeshAdapter.connect, (self, lora_sock))
+        self.socketThread = _thread.start_new_thread(PymeshAdapter._sendAndListen, (self, lora_sock))
 
 
-    def connect(this, lora_sock):
-        i = 0
-        while True:
-            m = Message(this.rawMac, this.ping, "Ping")
-            lora_sock.send(m.getBytes())
-            print('Sent {}'.format(m.getBytes()))
-            i= i+1
-            time.sleep(5)
-
-    def listen(this, lora_sock):
-        i = 0
+    def _sendAndListen(this, lora_sock):
+        chrono = Timer.Chrono()
+        chrono.start()
+        
+        print("Start listening")
         while (True):
-            if lora_sock.recv(64) == b'Ping':
-                lora_sock.send('Pong')
-                print('Pong {}'.format(i))
-                i = i+1
-            time.sleep(5)
+
+            # send some data
+            lora_sock.setblocking(True)
+            lora_sock.send('Hello')
+
+            # get any data received...
+            lora_sock.setblocking(False)
+            data = lora_sock.recv(64)
+            print(data)
+
+            # wait a random amount of time
+            time.sleep(machine.rng() & 0x0F)
+            #print(str(chrono.read()))
+
+            """if chrono.read() > 5:
+                chrono.stop()
+                content = bytes("Ping",'UTF-8')
+                m = Message(this.rawMac, 0, 1, content)
+                lora_sock.setblocking(True)
+                lora_sock.send(m.getBytes())
+                this.view.sendMessage(0,m.getBytes())
+                lora_sock.setblocking(False)
+                chrono.reset()
+                chrono.start()
+
+            lora_sock.setblocking(False)
+            buffer = lora_sock.recv(64)
+            if len(buffer) > 0:
+                print("recv")
+                print('Received {}'.format(buffer))
+                this.view.receiveMessage(0,bytes())"""
 
         
     def getMyAddress(self):
