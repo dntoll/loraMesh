@@ -10,17 +10,26 @@ class Message:
 
     def getBytes(self):
         ret = bytearray(3+len(self.contentBytes))
-        ret[0:2] = bytes((self.senderMac, self.receiverMac, self.messageType))
-        ret[3:] = self.contentBytes
+        ret[0:3] = bytes((self.senderMac, self.receiverMac, self.messageType, len(self.contentBytes)))
+        ret[4:] = self.contentBytes
         return bytes(ret)
     
     def fromBytes(bytes):
+        if len(bytes) < 4:
+            return (0, None)
+
         senderMac = bytes[0]
         receiverMac = bytes[1]
         messageType = bytes[2]
-        contentBytes = bytes[3:]
+        contentLength = bytes[3]
 
-        return Message(senderMac, receiverMac, messageType, contentBytes)
+        if len(bytes) < 4 + contentLength:
+            return (0, None) #not enough data in buffer
+
+
+        contentBytes = bytes[4:4+contentLength]
+
+        return (4+contentLength, Message(senderMac, receiverMac, messageType, contentBytes))
 
     def test():
         contentBytes = bytes((4,5,6))
@@ -28,8 +37,9 @@ class Message:
 
         byteMessage = m.getBytes()
 
-        r = Message.fromBytes(byteMessage)
+        cl, r = Message.fromBytes(byteMessage)
 
+        assert(cl == 4+3)
         assert(r.senderMac == m.senderMac)
         assert(r.receiverMac == m.receiverMac)
         assert(r.messageType == m.messageType)
