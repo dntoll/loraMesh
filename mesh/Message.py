@@ -5,7 +5,8 @@ class ToShortMessageException(Exception):
 class Message:
 
     TYPE_PING = 0
-    
+    TYPE_PONG = 1
+
 
     HEADER_BEGIN_CHAR = ord('\t')
     HEADER_BEGIN = 0
@@ -27,7 +28,7 @@ class Message:
         ret[Message.HEADER_BEGIN:Message.HEADER_SIZE] = bytes((Message.HEADER_BEGIN_CHAR, self.senderMac, self.receiverMac, self.messageType, len(self.contentBytes)))
         ret[Message.HEADER_SIZE:] = self.contentBytes
         return bytes(ret)
-    
+
     def fromBytes(bytes):
         if len(bytes) < Message.HEADER_SIZE:
             raise Exception("to small to be a message")
@@ -62,3 +63,26 @@ class Message:
         assert(r.receiverMac == m.receiverMac)
         assert(r.messageType == m.messageType)
         assert(r.contentBytes[0] == m.contentBytes[0] and r.contentBytes[1] == m.contentBytes[1] and r.contentBytes[2] == m.contentBytes[2]) #<- ? comparison?
+
+        toSMall = bytearray(Message.HEADER_SIZE-1)
+        try:
+            Message.fromBytes(toSMall)
+            assert(False)
+        except Exception:
+            print("Pass")
+
+        notCorrectStart = bytearray(Message.HEADER_SIZE)
+        try:
+            Message.fromBytes(notCorrectStart)
+            assert(False)
+        except Exception:
+            print("Pass")
+
+        notEnoughContent = bytearray(Message.HEADER_SIZE)
+        notEnoughContent[Message.HEADER_BEGIN] = Message.HEADER_BEGIN_CHAR
+        notEnoughContent[Message.CONTENT_LENGTH] = 1
+        try:
+            Message.fromBytes(notEnoughContent)
+            assert(False)
+        except ToShortMessageException:
+            print("Pass")

@@ -7,13 +7,12 @@ import struct
 import machine
 import _thread
 from network import LoRa
-
+import ubinascii, network
 from mesh.Message import Message
 from mesh.Message import ToShortMessageException
 from mesh.MeshController import MeshController
 
 class PymeshAdapter:
-    ping = 1
     BUFFER_SIZE = 256
 
     def __init__(self, view, messageCallback):
@@ -24,13 +23,16 @@ class PymeshAdapter:
         this = self
 
         self.messageCallback = messageCallback
-        
+
         lora = LoRa(mode=LoRa.LORA, region=LoRa.EU868)
         lora_sock = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
         lora_sock.setblocking(True)
 
+
+        self.macOneByte = ubinascii.hexlify(lora.mac())[0]
+
         self.savedBuffer = bytearray()
-        self.meshController = MeshController(messageCallback)
+        self.meshController = MeshController(messageCallback, self.getMyAddress())
 
         print("Starting threads")
         self.socketLock = _thread.allocate_lock()
@@ -38,6 +40,26 @@ class PymeshAdapter:
         self.listenThread = _thread.start_new_thread(PymeshAdapter._listen, (self, lora_sock))
         self.socketThread = _thread.start_new_thread(PymeshAdapter._sendThread, (self, lora_sock))
 
+
+
+    def _sendThread(this, lora_sock):
+        print("Start sending")
+
+        #m =
+        while (True):
+            this.meshControllerLock.acquire(1)
+            m = this.meshController.getMessage()
+            this.meshControllerLock.release()
+
+            if m is not None:
+                print("Sending...")
+                # send some data
+                this.socketLock.acquire(1)
+                lora_sock.setblocking(True)
+                lora_sock.send(m.getBytes())
+                this.socketLock.release()
+
+            time.sleep(machine.rng() & 0x0F)
 
     def _listen(this, lora_sock):
         print("Start listening")
@@ -49,29 +71,11 @@ class PymeshAdapter:
             data = lora_sock.recv(PymeshAdapter.BUFFER_SIZE)
             this.socketLock.release()
 
-            print(data)
             this.processReceivedBytes(data)
 
             # wait a random amount of time
             time.sleep(1)
 
-    def _sendThread(this, lora_sock):
-        print("Start sending")
-
-        #m = 
-        while (True):
-            this.meshControllerLock.acquire(1)
-            m = this.meshController.getMessage() 
-            this.meshControllerLock.release()
-
-            if m is not None:
-                # send some data
-                this.socketLock.acquire(1)
-                lora_sock.setblocking(True)
-                lora_sock.send(m.getBytes())
-                this.socketLock.release()
-
-            time.sleep(machine.rng() & 0x0F)
 
     #This is run by the receiver thread...
     def processReceivedBytes(self, receivedBytes):
@@ -87,7 +91,7 @@ class PymeshAdapter:
                     newBuffer = newBuffer[bytesEaten:]
 
                     self.meshControllerLock.acquire(1)
-                    self.meshController.onReceive(m) 
+                    self.meshController.onReceive(m)
                     self.meshControllerLock.release()
             except ToShortMessageException:
                 print("not full message received")
@@ -98,58 +102,35 @@ class PymeshAdapter:
 
         self.savedBuffer = bytearray(len(newBuffer))
         self.savedBuffer[0:] = newBuffer
-        
+
     def getMyAddress(self):
         #https://github.com/pycom/pycom-libraries/blob/master/pymesh/pymesh_frozen/lib/loramesh.py#L153
-        
+
         #Note we go beyond the mesh_interface we should use to get this one
-        return 1
-    
-    def isPartOfANetwork(self):
-        return False
+        return self.macOneByte
 
-
-    def stateToString(self, state):
-        return {
-            0: "STATE_DISABLED",
-            1: "STATE_DETACHED",
-            2: "STATE_CHILD",
-            3: "STATE_ROUTER",
-            4: "STATE_LEADER",
-            5: "STATE_LEADER_SINGLE" }[state]
-        return "STATE_UNKNOWN"
-
-    def printDebug(self):
-        return
-    
     def update(self):
         return
 
-
     def sendMessage(self, target_ip, message):
-
         m = Message(this.getMyAddress(), target_ip, Message.TYPE_PING, message)
         self.meshControllerLock.acquire(1)
-        self.meshController.append(m) 
+        self.meshController.append(m)
         self.meshControllerLock.release()
 
         self.view.sendMessage(target_ip, message)
-        
+
 
     def getAllIPs(self):
         self.meshControllerLock.acquire(1)
-        neighbors = self.meshController.getKnownNeighbors() 
+        neighbors = self.meshController.getKnownNeighbors()
         self.meshControllerLock.release()
         return neighbors
-        
 
     def new_message_cb(rcv_ip, rcv_port, rcv_data):
         global globalView
         global this
 
         this.numMessages += 1
-
         globalView.receiveMessage(rcv_ip, rcv_data)
-
         this.messageCallback(rcv_ip, rcv_data)
-

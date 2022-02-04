@@ -18,7 +18,7 @@ def mainLoopInThread(this, that):
 
 class AppController:
     def __init__(self):
-        
+
         self.view = CompositeView()
         self.view.add(RGBView())
         self.view.add(SerialConsoleView())
@@ -29,15 +29,13 @@ class AppController:
     def run(self):
         #Want to run the loop in a separate thread to make sure we can interract with the app on this one
         _thread.start_new_thread(mainLoopInThread, (self, self))
-    
+
     def messageCallback(self, rcv_ip, rcv_dat):
         message = rcv_dat.decode('utf-8')
-        print("Callback from %s: %s" % 
+        print("Callback from %s: %s" %
             (rcv_ip, message))
         if message == "Ping":
             self.sendToAll("Pong")
-
-
 
     def sendToAll(self, content):
         ips = self.pm.getAllIPs()
