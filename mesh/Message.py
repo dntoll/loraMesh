@@ -1,6 +1,20 @@
-
+class ToShortMessageException(Exception):
+    def __init__(self, text):
+        super().__init__(text)
 
 class Message:
+
+    TYPE_PING = 0
+    
+
+    HEADER_BEGIN_CHAR = ord('\t')
+    HEADER_BEGIN = 0
+    SENDER_MAC = 1 ##byte index
+    RECEIVER_MAC = SENDER_MAC + 1 #byte index
+    MESSAGE_TYPE = RECEIVER_MAC +1 #byte index
+    CONTENT_LENGTH = MESSAGE_TYPE +1 #byte index
+    HEADER_SIZE = CONTENT_LENGTH +1
+
     def __init__(self, senderMac, receiverMac, messageType, contentBytes):
         self.senderMac = senderMac
         self.receiverMac = receiverMac
@@ -9,27 +23,31 @@ class Message:
         return
 
     def getBytes(self):
-        ret = bytearray(3+len(self.contentBytes))
-        ret[0:3] = bytes((self.senderMac, self.receiverMac, self.messageType, len(self.contentBytes)))
-        ret[4:] = self.contentBytes
+        ret = bytearray(Message.HEADER_SIZE+len(self.contentBytes))
+        ret[Message.HEADER_BEGIN:Message.HEADER_SIZE] = bytes((Message.HEADER_BEGIN_CHAR, self.senderMac, self.receiverMac, self.messageType, len(self.contentBytes)))
+        ret[Message.HEADER_SIZE:] = self.contentBytes
         return bytes(ret)
     
     def fromBytes(bytes):
-        if len(bytes) < 4:
-            return (0, None)
+        if len(bytes) < Message.HEADER_SIZE:
+            raise Exception("to small to be a message")
 
-        senderMac = bytes[0]
-        receiverMac = bytes[1]
-        messageType = bytes[2]
-        contentLength = bytes[3]
+        headerBegin = bytes[Message.HEADER_BEGIN]
+        if headerBegin != Message.HEADER_BEGIN_CHAR:
+            raise Exception("messages should begin with " + chr(Message.HEADER_BEGIN_CHAR))
 
-        if len(bytes) < 4 + contentLength:
-            return (0, None) #not enough data in buffer
+        senderMac = bytes[Message.SENDER_MAC]
+        receiverMac = bytes[Message.RECEIVER_MAC]
+        messageType = bytes[Message.MESSAGE_TYPE]
+        contentLength = bytes[Message.CONTENT_LENGTH]
+
+        if len(bytes) < Message.HEADER_SIZE + contentLength:
+            raise ToShortMessageException("not enough data in Buffer, perhaps not full message received")
 
 
-        contentBytes = bytes[4:4+contentLength]
+        contentBytes = bytes[Message.HEADER_SIZE: Message.HEADER_SIZE + contentLength]
 
-        return (4+contentLength, Message(senderMac, receiverMac, messageType, contentBytes))
+        return (Message.HEADER_SIZE+contentLength, Message(senderMac, receiverMac, messageType, contentBytes))
 
     def test():
         contentBytes = bytes((4,5,6))
@@ -39,7 +57,7 @@ class Message:
 
         cl, r = Message.fromBytes(byteMessage)
 
-        assert(cl == 4+3)
+        assert(cl == Message.HEADER_SIZE + 3)
         assert(r.senderMac == m.senderMac)
         assert(r.receiverMac == m.receiverMac)
         assert(r.messageType == m.messageType)
