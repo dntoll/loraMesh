@@ -7,14 +7,26 @@ class Message:
     TYPE_MESSAGE = 0
     TYPE_ACC = 1
 
+    
+    HEADER_BEGIN_CHAR = ord('#')
+    HEADER_END_CHAR = ord('>')
+    MESSAGE_END_CHAR = ord('<')
 
-    HEADER_BEGIN_CHAR = ord('\t')
+    #"#"
+    #Sender
+    #Message type
+    #Route len
+    #Content len
+    #'>'
+    #content
+    #'<'
     HEADER_BEGIN = 0
-    SENDER_MAC = 1 ##byte index
-    MESSAGE_TYPE = SENDER_MAC +1 #byte index
+    SENDER_MAC = 1 
+    MESSAGE_TYPE = SENDER_MAC +1 
     ROUTE_LENGTH = MESSAGE_TYPE +1
-    CONTENT_LENGTH = ROUTE_LENGTH +1 #byte index
-    HEADER_SIZE = CONTENT_LENGTH +1
+    CONTENT_LENGTH = ROUTE_LENGTH +1 
+    HEADER_END = CONTENT_LENGTH +1
+    HEADER_SIZE = HEADER_END +1
 
     def __init__(self, senderMac, route, messageType, contentBytes):
         self.senderMac = senderMac
@@ -27,12 +39,16 @@ class Message:
         return self.route[len(self.route)-1]
 
     def getBytes(self):
-        completeMessageSizeBytes = Message.HEADER_SIZE + len(self.contentBytes) + len(self.route)
+        completeMessageSizeBytes = Message.HEADER_SIZE + len(self.contentBytes) + len(self.route)+1
 
         ret = bytearray(completeMessageSizeBytes)
-        ret[Message.HEADER_BEGIN:Message.HEADER_SIZE] = bytes((Message.HEADER_BEGIN_CHAR, self.senderMac, self.messageType, len(self.route), len(self.contentBytes)))
-        ret[Message.HEADER_SIZE:] = self.route
-        ret[Message.HEADER_SIZE + len(self.route):] = self.contentBytes
+        ret[Message.HEADER_BEGIN:Message.HEADER_SIZE] = bytes((Message.HEADER_BEGIN_CHAR, self.senderMac, self.messageType, len(self.route), len(self.contentBytes), Message.HEADER_END_CHAR))
+        ret[Message.HEADER_SIZE : Message.HEADER_SIZE+len(self.route)] = self.route
+        ret[Message.HEADER_SIZE + len(self.route): Message.HEADER_SIZE+len(self.route) + len(self.contentBytes)] = self.contentBytes
+
+        
+        ret[completeMessageSizeBytes-1] = Message.MESSAGE_END_CHAR
+
         return bytes(ret)
 
     def fromBytes(bytes):
@@ -41,20 +57,22 @@ class Message:
 
         headerBegin = bytes[Message.HEADER_BEGIN]
         if headerBegin != Message.HEADER_BEGIN_CHAR:
-            raise Exception("messages should begin with " + chr(Message.HEADER_BEGIN_CHAR))
+            raise Exception("headers should begin with " + chr(Message.HEADER_BEGIN_CHAR))
+        
+        if bytes[Message.HEADER_END] != Message.HEADER_END_CHAR:
+            raise Exception("headers should end with " + chr(Message.HEADER_END_CHAR) + " was " + str(bytes[Message.HEADER_END]))
 
         senderMac = bytes[Message.SENDER_MAC]
         messageType = bytes[Message.MESSAGE_TYPE]
         contentLength = bytes[Message.CONTENT_LENGTH]
         routeLength = bytes[Message.ROUTE_LENGTH]
-
-        
-
-        completeMessageSizeBytes = Message.HEADER_SIZE + contentLength + routeLength
+        completeMessageSizeBytes = Message.HEADER_SIZE + contentLength + routeLength + 1
 
         if len(bytes) < completeMessageSizeBytes :
             raise ToShortMessageException("not enough data in Buffer, perhaps not full message received")
-
+        
+        if bytes[completeMessageSizeBytes-1] != Message.MESSAGE_END_CHAR:
+            raise Exception("Messages should end with " + chr(Message.MESSAGE_END_CHAR))
 
         route =        bytes[Message.HEADER_SIZE              : Message.HEADER_SIZE + routeLength]
         contentBytes = bytes[Message.HEADER_SIZE + routeLength: Message.HEADER_SIZE + routeLength + contentLength]
@@ -64,13 +82,13 @@ class Message:
     def test():
         contentBytes = bytes((4,5,6))
         route = bytes((2,3))
-        m = Message(1,route,3,contentBytes)
+        m = Message(1, route, Message.TYPE_MESSAGE, contentBytes)
 
         byteMessage = m.getBytes()
 
         cl, r = Message.fromBytes(byteMessage)
 
-        assert(cl == Message.HEADER_SIZE + 3 + 2)
+        assert(cl == Message.HEADER_SIZE + 3 + 2 + 1)
         assert(r.senderMac == m.senderMac)
         assert(r.route[0] == m.route[0] and r.route[1] == m.route[1])
         assert(r.messageType == m.messageType)
@@ -92,6 +110,7 @@ class Message:
 
         notEnoughContent = bytearray(Message.HEADER_SIZE)
         notEnoughContent[Message.HEADER_BEGIN] = Message.HEADER_BEGIN_CHAR
+        notEnoughContent[Message.HEADER_END] = Message.HEADER_END_CHAR
         notEnoughContent[Message.CONTENT_LENGTH] = 1
         try:
             Message.fromBytes(notEnoughContent)

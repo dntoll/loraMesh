@@ -1,4 +1,8 @@
-New classes
+
+
+PymeshAdapter is too hard to read due to locks... 
+
+We also need better console view
 
 # SendQue -> hålla reda på vilka meddelanden som är skickade och vilka som är accade
 meddelande läggs till när vi vill skicka ett meddelande.
@@ -11,7 +15,9 @@ Se till att vi accar dem?
 Dubbletter av meddelanden försvinner
 
 # Routes
-Neighbors
+Derive routes from messages
+Get best route
+Ask for unknown routes
 
 # Route message
 

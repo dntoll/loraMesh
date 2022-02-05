@@ -27,12 +27,12 @@ class PymeshAdapter:
 
         self.messageCallback = messageCallback
 
-        lora = LoRa(mode=LoRa.LORA, region=LoRa.EU868)
+        self.lora = LoRa(mode=LoRa.LORA, region=LoRa.EU868)
         lora_sock = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
         lora_sock.setblocking(True)
 
 
-        self.macOneByte = ubinascii.hexlify(lora.mac())[15]
+        self.macOneByte = ubinascii.hexlify(self.lora.mac())[15]
 
         
         self.meshController = MeshController(messageCallback, self.getMyAddress())
@@ -72,22 +72,23 @@ class PymeshAdapter:
             this.socketLock.acquire(1)
             lora_sock.setblocking(False)
             data = lora_sock.recv(ReceiveBuffer.BUFFER_SIZE)
+            loraStats = this.lora.stats()
             this.socketLock.release()
 
-            this.processReceivedBytes(data)
+            this.processReceivedBytes(data, loraStats)
 
             # wait a random amount of time
             time.sleep(1)
 
 
     #This is run by the receiver thread...
-    def processReceivedBytes(self, receivedBytes):
+    def processReceivedBytes(self, receivedBytes, loraStats):
         messages = self.receiveBuffer.getMessages(receivedBytes)
 
         if len(messages) > 0:
             self.meshControllerLock.acquire(1)
             for m in messages:
-                self.meshController.onReceive(m)
+                self.meshController.onReceive(m, loraStats)
             self.meshControllerLock.release()
                 
 
@@ -101,11 +102,12 @@ class PymeshAdapter:
         return
 
     def sendMessage(self, target_ip, message):
-        route = bytearray(1)
-        route[0] = target_ip
-        m = Message(this.getMyAddress(), route, Message.TYPE_MESSAGE, message)
         self.meshControllerLock.acquire(1)
+
+        route = self.meshController.router.getRoute(target_ip)
+        m = Message(this.getMyAddress(), route, Message.TYPE_MESSAGE, message)
         self.meshController.append(m)
+
         self.meshControllerLock.release()
 
         self.view.sendMessage(target_ip, message)
