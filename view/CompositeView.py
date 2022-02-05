@@ -7,28 +7,27 @@ class CompositeView:
     def add(self, view):
         self.views.append(view)
 
-    def donePymeshInit(self, mac):
+    def receiveMessages(self, messages):
         for v in self.views:
-            v.donePymeshInit(mac)
+            v.receiveMessages(messages)
 
-    def receiveMessage(self, ip, message):
+    def receiveMessageToMe(self, messages):
         for v in self.views:
-            v.receiveMessage(ip, message)
-
-    def sendMessage(self, ip, message):
-        for v in self.views:
-            v.sendMessage(ip, message)
+            v.receiveMessageToMe(messages)
     
-    def notConnected(self, message):
+    def receiveAccToMe(self, message):
         for v in self.views:
-            v.notConnected(message)
-    
-    def isConnected(self, myAddress, otherNodesInNetwork):
-        for v in self.views:
-            v.isConnected(myAddress, otherNodesInNetwork)
-    
+            v.receiveAccToMe(message)
     
 
+    def sendMessage(self, message):
+        for v in self.views:
+            v.sendMessage(message)
+    
     def showIps(self, ips):
         for v in self.views:
             v.showIps(ips)
+    
+    def update(self, pymeshAdapter):
+        for v in self.views:
+            v.update(pymeshAdapter)

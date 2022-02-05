@@ -12,22 +12,22 @@ class RGBView:
     def __init__(self):
         pycom.heartbeat(False)
     
-    def donePymeshInit(self, mac):
+    def receiveMessages(self, messages):
+        self._blink(1, self.BLUE)
+
+    def receiveMessageToMe(self, message):
+        self._blink(1, self.RED)
+
+    def receiveAccToMe(self, message):
         self._blink(1, self.WHITE)
 
-    def receiveMessage(self, ip, message):
-        self._blink(3, self.BLUE)
-
-    def sendMessage(self, ip, message):
+    def sendMessage(self, message):
         self._blink(3, self.GREEN)
-
-    def notConnected(self, message):
-        self._blink(1, self.RED)
-    
-    def isConnected(self, myAddress, otherNodesInNetwork):
+  
+    def showIps(self, ips):
         return
     
-    def showIps(self, ips):
+    def update(self, pymeshAdapter):
         return
 
     def _blink(self, times, color):

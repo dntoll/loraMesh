@@ -13,7 +13,8 @@ class Router:
         self.neighbors.add(message.senderMac)
 
 
-    def getRoute(self, senderMac):
-        route = bytearray(1)
-        route[0] = senderMac
+    def getRoute(self, fromMac, toMac):
+        route = bytearray(2)
+        route[0] = fromMac
+        route[1] = toMac
         return route

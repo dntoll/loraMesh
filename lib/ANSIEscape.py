@@ -45,6 +45,7 @@ class ANSIEscape:
     def goToXY(x, y):
         return "\u001b[" +str(y) + ";"+ str(x)+"H"
 
+
     def clearScreen():
         return "\u001b[2J"
 

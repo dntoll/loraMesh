@@ -38,6 +38,30 @@ class Message:
     def getTarget(self):
         return self.route[len(self.route)-1]
 
+    def getOrigin(self):
+        return self.route[0]
+
+    def IShouldRoute(self, potentialRouterMac):
+        detta verkar inte vara implementerat ännu alltså " not in"
+        if potentialRouterMac not in self.route:
+            return False
+        #Only route if potentialRouterMac is after self.senderMac
+        if self._isAfter(self.senderMac, potentialRouterMac):
+            return True
+        return False
+    
+    def getNextInRoute(self, potentialRouterMac):
+        self.route[self.route.index(potentialRouterMac)+1]
+
+    def _isAfter(self):
+        if potentialRouterMac not in self.route:
+            return False
+        
+        if self.senderMac not in self.route: #it might come from the original sender
+            return True
+
+        return self.route.index(potentialRouterMac) > self.route.index(self.senderMac)
+
     def getBytes(self):
         completeMessageSizeBytes = Message.HEADER_SIZE + len(self.contentBytes) + len(self.route)+1
 
