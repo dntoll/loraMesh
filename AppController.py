@@ -34,8 +34,6 @@ class AppController:
         message = rcv_dat.decode('utf-8')
         print("Callback from %s: %s" %
             (rcv_ip, message))
-        if message == "Ping":
-            self.sendToAll("Pong")
 
     def sendToAll(self, content):
         ips = self.pm.getAllIPs()

@@ -1,6 +1,6 @@
-#import pycom
+import pycom
 
-#pycom.pybytes_on_boot(False)
+pycom.pybytes_on_boot(False)
 
 from AppController import AppController
 from mesh.Message import Message
@@ -15,5 +15,8 @@ Message.test()
 a = AppController()
 a.run()
 
+def p():
+    global a
+    a.pm.sendMessage(55, b"Ping")
 
 

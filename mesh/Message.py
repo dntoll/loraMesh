@@ -4,8 +4,8 @@ class ToShortMessageException(Exception):
 
 class Message:
 
-    TYPE_PING = 0
-    TYPE_PONG = 1
+    TYPE_MESSAGE = 0
+    TYPE_ACC = 1
 
 
     HEADER_BEGIN_CHAR = ord('\t')
