@@ -9,11 +9,12 @@ import _thread
 from network import LoRa
 import ubinascii, network
 from mesh.Message import Message
-from mesh.Message import ToShortMessageException
+
 from mesh.MeshController import MeshController
+from mesh.ReceiveBuffer import ReceiveBuffer
 
 class PymeshAdapter:
-    BUFFER_SIZE = 256
+    
 
     def __init__(self, view, messageCallback):
         global globalView
@@ -22,6 +23,8 @@ class PymeshAdapter:
         self.view = view
         this = self
 
+        self.receiveBuffer = ReceiveBuffer()
+
         self.messageCallback = messageCallback
 
         lora = LoRa(mode=LoRa.LORA, region=LoRa.EU868)
@@ -29,12 +32,12 @@ class PymeshAdapter:
         lora_sock.setblocking(True)
 
 
-        self.macOneByte = ubinascii.hexlify(lora.mac())[0]
+        self.macOneByte = ubinascii.hexlify(lora.mac())[15]
 
-        self.savedBuffer = bytearray()
+        
         self.meshController = MeshController(messageCallback, self.getMyAddress())
 
-        print("Starting threads")
+        print("Starting threads on " + str(self.macOneByte))
         self.socketLock = _thread.allocate_lock()
         self.meshControllerLock = _thread.allocate_lock()
         self.listenThread = _thread.start_new_thread(PymeshAdapter._listen, (self, lora_sock))
@@ -68,7 +71,7 @@ class PymeshAdapter:
             # get any data received...
             this.socketLock.acquire(1)
             lora_sock.setblocking(False)
-            data = lora_sock.recv(PymeshAdapter.BUFFER_SIZE)
+            data = lora_sock.recv(ReceiveBuffer.BUFFER_SIZE)
             this.socketLock.release()
 
             this.processReceivedBytes(data)
@@ -79,29 +82,14 @@ class PymeshAdapter:
 
     #This is run by the receiver thread...
     def processReceivedBytes(self, receivedBytes):
-        newBuffer = bytearray(len(self.savedBuffer) + len(receivedBytes))
-        newBuffer[0:len(self.savedBuffer)] = self.savedBuffer
-        newBuffer[len(self.savedBuffer):] = receivedBytes
+        messages = self.receiveBuffer.getMessages(receivedBytes)
 
-        while(len(newBuffer) > 0):
-            try:
-                bytesEaten, m = Message.fromBytes(newBuffer)
-                if bytesEaten > 0:
-                    print(m.contentBytes.decode("utf-8"))
-                    newBuffer = newBuffer[bytesEaten:]
-
-                    self.meshControllerLock.acquire(1)
-                    self.meshController.onReceive(m)
-                    self.meshControllerLock.release()
-            except ToShortMessageException:
-                print("not full message received")
-                break
-            except Exception as err:
-                print("Exception {0}".format(err) + str(newBuffer))
-                newBuffer = newBuffer[1:]
-
-        self.savedBuffer = bytearray(len(newBuffer))
-        self.savedBuffer[0:] = newBuffer
+        if len(messages) > 0:
+            self.meshControllerLock.acquire(1)
+            for m in messages:
+                self.meshController.onReceive(m)
+            self.meshControllerLock.release()
+                
 
     def getMyAddress(self):
         #https://github.com/pycom/pycom-libraries/blob/master/pymesh/pymesh_frozen/lib/loramesh.py#L153

@@ -17,6 +17,6 @@ a.run()
 
 def p():
     global a
-    a.pm.sendMessage(55, b"Ping")
+    a.pm.sendMessage(52, b"Ping")
 
 

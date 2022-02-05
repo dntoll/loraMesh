@@ -15,9 +15,8 @@ class MeshController:
 
         if message.receiverMac is self.myMac:
             self.messageCallback(message.senderMac, message.contentBytes)
-            print("after callback")
             if message.messageType is Message.TYPE_MESSAGE:
-                print("send acc")
+                print("acc")
                 self.append(Message(self.myMac, message.senderMac, Message.TYPE_ACC, bytes()))
             elif message.messageType is Message.TYPE_ACC:
                 print("message was acced")
