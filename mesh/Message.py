@@ -11,22 +11,28 @@ class Message:
     HEADER_BEGIN_CHAR = ord('\t')
     HEADER_BEGIN = 0
     SENDER_MAC = 1 ##byte index
-    RECEIVER_MAC = SENDER_MAC + 1 #byte index
-    MESSAGE_TYPE = RECEIVER_MAC +1 #byte index
-    CONTENT_LENGTH = MESSAGE_TYPE +1 #byte index
+    MESSAGE_TYPE = SENDER_MAC +1 #byte index
+    ROUTE_LENGTH = MESSAGE_TYPE +1
+    CONTENT_LENGTH = ROUTE_LENGTH +1 #byte index
     HEADER_SIZE = CONTENT_LENGTH +1
 
-    def __init__(self, senderMac, receiverMac, messageType, contentBytes):
+    def __init__(self, senderMac, route, messageType, contentBytes):
         self.senderMac = senderMac
-        self.receiverMac = receiverMac
+        self.route = route
         self.messageType = messageType
         self.contentBytes = contentBytes
         return
 
+    def getTarget(self):
+        return self.route[len(self.route)-1]
+
     def getBytes(self):
-        ret = bytearray(Message.HEADER_SIZE+len(self.contentBytes))
-        ret[Message.HEADER_BEGIN:Message.HEADER_SIZE] = bytes((Message.HEADER_BEGIN_CHAR, self.senderMac, self.receiverMac, self.messageType, len(self.contentBytes)))
-        ret[Message.HEADER_SIZE:] = self.contentBytes
+        completeMessageSizeBytes = Message.HEADER_SIZE + len(self.contentBytes) + len(self.route)
+
+        ret = bytearray(completeMessageSizeBytes)
+        ret[Message.HEADER_BEGIN:Message.HEADER_SIZE] = bytes((Message.HEADER_BEGIN_CHAR, self.senderMac, self.messageType, len(self.route), len(self.contentBytes)))
+        ret[Message.HEADER_SIZE:] = self.route
+        ret[Message.HEADER_SIZE + len(self.route):] = self.contentBytes
         return bytes(ret)
 
     def fromBytes(bytes):
@@ -38,29 +44,35 @@ class Message:
             raise Exception("messages should begin with " + chr(Message.HEADER_BEGIN_CHAR))
 
         senderMac = bytes[Message.SENDER_MAC]
-        receiverMac = bytes[Message.RECEIVER_MAC]
         messageType = bytes[Message.MESSAGE_TYPE]
         contentLength = bytes[Message.CONTENT_LENGTH]
+        routeLength = bytes[Message.ROUTE_LENGTH]
 
-        if len(bytes) < Message.HEADER_SIZE + contentLength:
+        
+
+        completeMessageSizeBytes = Message.HEADER_SIZE + contentLength + routeLength
+
+        if len(bytes) < completeMessageSizeBytes :
             raise ToShortMessageException("not enough data in Buffer, perhaps not full message received")
 
 
-        contentBytes = bytes[Message.HEADER_SIZE: Message.HEADER_SIZE + contentLength]
+        route =        bytes[Message.HEADER_SIZE              : Message.HEADER_SIZE + routeLength]
+        contentBytes = bytes[Message.HEADER_SIZE + routeLength: Message.HEADER_SIZE + routeLength + contentLength]
 
-        return (Message.HEADER_SIZE+contentLength, Message(senderMac, receiverMac, messageType, contentBytes))
+        return (completeMessageSizeBytes, Message(senderMac, route, messageType, contentBytes))
 
     def test():
         contentBytes = bytes((4,5,6))
-        m = Message(1,2,3,contentBytes)
+        route = bytes((2,3))
+        m = Message(1,route,3,contentBytes)
 
         byteMessage = m.getBytes()
 
         cl, r = Message.fromBytes(byteMessage)
 
-        assert(cl == Message.HEADER_SIZE + 3)
+        assert(cl == Message.HEADER_SIZE + 3 + 2)
         assert(r.senderMac == m.senderMac)
-        assert(r.receiverMac == m.receiverMac)
+        assert(r.route[0] == m.route[0] and r.route[1] == m.route[1])
         assert(r.messageType == m.messageType)
         assert(r.contentBytes[0] == m.contentBytes[0] and r.contentBytes[1] == m.contentBytes[1] and r.contentBytes[2] == m.contentBytes[2]) #<- ? comparison?
 

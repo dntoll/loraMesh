@@ -101,7 +101,9 @@ class PymeshAdapter:
         return
 
     def sendMessage(self, target_ip, message):
-        m = Message(this.getMyAddress(), target_ip, Message.TYPE_MESSAGE, message)
+        route = bytearray(1)
+        route[0] = target_ip
+        m = Message(this.getMyAddress(), route, Message.TYPE_MESSAGE, message)
         self.meshControllerLock.acquire(1)
         self.meshController.append(m)
         self.meshControllerLock.release()
