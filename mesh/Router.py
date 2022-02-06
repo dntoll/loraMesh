@@ -5,13 +5,15 @@ from mesh.Route import Route
 class Router:
 
     def __init__(self):
-        self.neighbors = set()
+        self.neighbors = []
 
     def deriveRouterData(self, message, receivedLoraStats):
 
         #receivedLoraStats from lora.stats() https://docs.pycom.io/firmwareapi/pycom/network/lora/
-        self.neighbors.add(message.senderMac)
+        self.neighbors.append(message.senderMac)
 
+    def getKnownRoutes(self):
+        return self.neighbors
 
     def getRoute(self, fromMac, toMac):
         route = bytearray(2)

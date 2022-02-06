@@ -1,8 +1,12 @@
 from mesh.Route import Route
+from mesh.MessageChecksum import MessageChecksum
 
 class ToShortMessageException(Exception):
     def __init__(self, text):
         super().__init__(text)
+
+
+
 
 class Message:
 
@@ -37,10 +41,18 @@ class Message:
         self.contentBytes = contentBytes
         return
 
-    
+    def isAcc(self):
+        return self.messageType == Message.TYPE_ACC
+
     def getRoute(self):
         return self.route
- 
+
+    #is self a checksum
+    def isAccOf(self, message):
+        accChecksum = MessageChecksum.fromBytes(self.contentBytes)
+        message = MessageChecksum.fromMessage(message)
+        return accChecksum.isSame(message)
+    
 
     def getBytes(self):
 
@@ -69,6 +81,8 @@ class Message:
         if bytes[Message.HEADER_END] != Message.HEADER_END_CHAR:
             raise Exception("headers should end with " + chr(Message.HEADER_END_CHAR) + " was " + str(bytes[Message.HEADER_END]))
 
+
+        
         senderMac = bytes[Message.SENDER_MAC]
         messageType = bytes[Message.MESSAGE_TYPE]
         contentLength = bytes[Message.CONTENT_LENGTH]
@@ -81,6 +95,7 @@ class Message:
         if bytes[completeMessageSizeBytes-1] != Message.MESSAGE_END_CHAR:
             raise Exception("Messages should end with " + chr(Message.MESSAGE_END_CHAR))
 
+        
         route =        bytes[Message.HEADER_SIZE              : Message.HEADER_SIZE + routeLength]
         contentBytes = bytes[Message.HEADER_SIZE + routeLength: Message.HEADER_SIZE + routeLength + contentLength]
 
@@ -124,3 +139,6 @@ class Message:
             assert(False)
         except ToShortMessageException:
             print("Pass")
+
+        m = Message.fromBytes(b"#4\x01\x02\x03>4242\x8f<")
+        print(m)

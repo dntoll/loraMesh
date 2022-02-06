@@ -28,9 +28,14 @@ class PymeshAdapter:
 
     def getMessagesInSendQue(self):
         self.meshControllerLock.acquire(1)
-        m = self.meshController.getMessagesInSendQue()
+        m = self.meshController.getSendQue().getSendQue()
         self.meshControllerLock.release()
+        return m
 
+    def getKnownRoutes(self):
+        self.meshControllerLock.acquire(1)
+        m = self.meshController.router.getKnownRoutes()
+        self.meshControllerLock.release()
         return m
 
 
@@ -40,14 +45,14 @@ class PymeshAdapter:
         #m =
         while (True):
             this.meshControllerLock.acquire(1)
-            m = this.meshController.getMessage()
+            m = this.meshController.getSendQue().getMessageToSend()
             this.meshControllerLock.release()
 
             if m is not None:
                 lora_sock.send(m.getBytes())
                 this.view.sendMessage(m)
 
-            time.sleep(machine.rng() & 0x0F)
+            time.sleep(machine.rng() % 3)
 
     def _listen(this, lora_sock):
         print("Start listening")
@@ -83,7 +88,7 @@ class PymeshAdapter:
 
         route = self.meshController.router.getRoute(self.getMyAddress(), target_ip)
         m = Message(self.getMyAddress(), route, Message.TYPE_MESSAGE, message)
-        self.meshController.append(m)
+        self.meshController.addToQue(m)
 
         self.meshControllerLock.release()
 

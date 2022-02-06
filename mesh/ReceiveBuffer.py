@@ -19,15 +19,17 @@ class ReceiveBuffer:
         while(len(newBuffer) > 0):
             try:
                 bytesEaten, m = Message.fromBytes(newBuffer)
+                
                 if bytesEaten > 0:
-                    print(m.contentBytes.decode("utf-8"))
                     newBuffer = newBuffer[bytesEaten:]
-
+                    
                     ret.append(m)
             except ToShortMessageException:
                 print("not full message received")
                 break
             except Exception as err:
+                print("Exception in getBytes")
+                print(err)
                 print("Reducing received buffer -- {0}".format(err) + str(newBuffer))
                 newBuffer = newBuffer[1:]
 

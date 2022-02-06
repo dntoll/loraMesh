@@ -1,11 +1,13 @@
 from mesh.Message import Message
 from mesh.Router import Router
+from mesh.SendQue import SendQue
+from mesh.MessageChecksum import MessageChecksum
 
 #this class implements the mesh network protocol
 class MeshController:
 
     def __init__(self, view, myMac):
-        self.sendQue = []
+        self.sendQue = SendQue()
         self.router = Router()
         
         self.view = view
@@ -20,7 +22,7 @@ class MeshController:
         else:
             self._receivedMessageMeantForOther(message)
     
-    def getMessagesInSendQue(self):
+    def getSendQue(self):
         return self.sendQue
         
 
@@ -31,8 +33,12 @@ class MeshController:
 
             self.view.receiveMessageToMe(message)    
             route = self.router.getRoute(self.myMac, route.getOrigin())
-            self.append(Message(self.myMac, route, Message.TYPE_ACC, bytes()))
-        elif message.messageType is Message.TYPE_ACC:
+
+            checksum = MessageChecksum.fromMessage(message)
+            
+            self.addToQue(Message(self.myMac, route, Message.TYPE_ACC, checksum.toBytes()))
+        elif message.isAcc():
+            self.sendQue.receiveAcc(message)
             self.view.receiveAccToMe(message)
 
     def _receivedMessageMeantForOther(self, message):    
@@ -41,19 +47,18 @@ class MeshController:
 
         messageFinalTarget = route.getTarget()
         print("Target was " + str(messageFinalTarget))
-
         if route.IShouldRoute(message.senderMac, self.myMac):
             print("I should route...")
-            self.append(Message(self.myMac, route, message.messageType, message.contentBytes))
-
-    def getMessage(self):
-        if len(self.sendQue) > 0:
-            return self.sendQue.pop()
-        return None
+            self.addToQue(Message(self.myMac, route, message.messageType, message.contentBytes))
+        else:
+            print("I should not route...")
+            self.sendQue.perhapsPartialAcc(message) 
+            #I need not to send it again if I received it from someone downstream from me
+            
 
 
     def getKnownNeighbors(self):
         return self.neighbors
 
-    def append(self, message):
-        self.sendQue.append(message)
+    def addToQue(self, message):
+        self.sendQue.addToQue(message)

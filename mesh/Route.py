@@ -16,10 +16,11 @@ class Route:
     def getOrigin(self):
         return self.route[0]
 
+    def getNumberOfJumps(self):
+        return len(self.route)-1
+
     
     def IShouldRoute(self, senderOfMessage, potentialRouterMac):
-        
-
         foundSender = False
         for ref in self.route:
             if ref == senderOfMessage:
