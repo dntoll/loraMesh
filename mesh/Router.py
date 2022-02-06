@@ -1,6 +1,6 @@
 
 
-    
+from mesh.Route import Route
 
 class Router:
 
@@ -17,4 +17,4 @@ class Router:
         route = bytearray(2)
         route[0] = fromMac
         route[1] = toMac
-        return route
+        return Route.fromBytes(route)

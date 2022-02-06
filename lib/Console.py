@@ -23,23 +23,20 @@ class Console:
     def show(self):
         for val in self.values:
             self.buffer += val.get(self.height)
-        script = ""
-        script += ANSIEscape.goToXY(0,0)
+        script = ANSIEscape.saveState()
         script += self.buffer
-        print(script + ANSIEscape.goToXY(0, self.height) )
+        print(script + ANSIEscape.loadState(), end='')
         self.clear()
 
     def frame(self, x, y, width, height):
         self.buffer += ANSIEscape.goToXY(x+width,y+height)
-        self.buffer +=  ANSIEscape.clearFromCursorToBeginning()
+        #self.buffer +=  ANSIEscape.clearFromCursorToBeginning()
 
         self.buffer += ANSIEscape.goToXY(x,y)
         self.printAt( '/' + (width-2) *  '-' + '\\', x,y, "Blue", "Black")
         for n in range(2, height):
-            self.printAt('|', x, n, "Blue", "Black")
-            self.printAt('|', x+width, n, "Blue", "Black")
+            self.printAt( '|' + (width-2) *  ' ' + '|', x,y+n, "Blue", "Black")
         self.printAt('\\' + (width-2)*'-' + '/', x, height, "Blue", "Black")
-        self.buffer += ANSIEscape.goToXY(0,y+height+1)
         ##for y in range(0, self.height):
         #    self.buffer
     def createValue(self, title, unit, decimals, x, y, color, background, detail):

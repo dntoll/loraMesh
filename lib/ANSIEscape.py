@@ -75,4 +75,9 @@ class ANSIEscape:
     def clearLine():
         return "\u001b[2K"
 
+    def saveState():
+        return "\u001b7"
+    def loadState():
+        return "\u001b8"
+
 

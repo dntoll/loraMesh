@@ -14,8 +14,8 @@ class MeshController:
     def onReceive(self, message, loraStats):
         self.router.deriveRouterData(message, loraStats)
 
-        messageFinalTarget = message.getTarget()
-        if messageFinalTarget is self.myMac:
+        route = message.getRoute()
+        if route.getTarget() is self.myMac:
             self._reachedFinalTarget(message)
         else:
             self._receivedMessageMeantForOther(message)
@@ -26,19 +26,25 @@ class MeshController:
 
     def _reachedFinalTarget(self, message):
         if message.messageType is Message.TYPE_MESSAGE:
+
+            route = message.getRoute()
+
             self.view.receiveMessageToMe(message)    
-            route = self.router.getRoute(self.myMac, message.getOrigin())
+            route = self.router.getRoute(self.myMac, route.getOrigin())
             self.append(Message(self.myMac, route, Message.TYPE_ACC, bytes()))
         elif message.messageType is Message.TYPE_ACC:
             self.view.receiveAccToMe(message)
 
     def _receivedMessageMeantForOther(self, message):    
-        messageFinalTarget = message.getTarget()
+
+        route = message.getRoute()
+
+        messageFinalTarget = route.getTarget()
         print("Target was " + str(messageFinalTarget))
 
-        if message.IShouldRoute(self.myMac):
-            nextInRouteMac = message.getNextInRoute(self.myMac)
-            self.append(Message(self.myMac, message.route, message.messageType, message.contentBytes))
+        if route.IShouldRoute(message.senderMac, self.myMac):
+            print("I should route...")
+            self.append(Message(self.myMac, route, message.messageType, message.contentBytes))
 
     def getMessage(self):
         if len(self.sendQue) > 0:

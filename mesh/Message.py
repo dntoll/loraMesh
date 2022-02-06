@@ -1,3 +1,5 @@
+from mesh.Route import Route
+
 class ToShortMessageException(Exception):
     def __init__(self, text):
         super().__init__(text)
@@ -35,40 +37,21 @@ class Message:
         self.contentBytes = contentBytes
         return
 
-    def getTarget(self):
-        return self.route[len(self.route)-1]
-
-    def getOrigin(self):
-        return self.route[0]
-
-    def IShouldRoute(self, potentialRouterMac):
-        detta verkar inte vara implementerat ännu alltså " not in"
-        if potentialRouterMac not in self.route:
-            return False
-        #Only route if potentialRouterMac is after self.senderMac
-        if self._isAfter(self.senderMac, potentialRouterMac):
-            return True
-        return False
     
-    def getNextInRoute(self, potentialRouterMac):
-        self.route[self.route.index(potentialRouterMac)+1]
-
-    def _isAfter(self):
-        if potentialRouterMac not in self.route:
-            return False
-        
-        if self.senderMac not in self.route: #it might come from the original sender
-            return True
-
-        return self.route.index(potentialRouterMac) > self.route.index(self.senderMac)
+    def getRoute(self):
+        return self.route
+ 
 
     def getBytes(self):
-        completeMessageSizeBytes = Message.HEADER_SIZE + len(self.contentBytes) + len(self.route)+1
+
+        routeBytes = self.route.getBytes()
+        routeLength = len(routeBytes);
+        completeMessageSizeBytes = Message.HEADER_SIZE + len(self.contentBytes) + routeLength+1
 
         ret = bytearray(completeMessageSizeBytes)
-        ret[Message.HEADER_BEGIN:Message.HEADER_SIZE] = bytes((Message.HEADER_BEGIN_CHAR, self.senderMac, self.messageType, len(self.route), len(self.contentBytes), Message.HEADER_END_CHAR))
-        ret[Message.HEADER_SIZE : Message.HEADER_SIZE+len(self.route)] = self.route
-        ret[Message.HEADER_SIZE + len(self.route): Message.HEADER_SIZE+len(self.route) + len(self.contentBytes)] = self.contentBytes
+        ret[Message.HEADER_BEGIN : Message.HEADER_SIZE] = bytes((Message.HEADER_BEGIN_CHAR, self.senderMac, self.messageType, routeLength, len(self.contentBytes), Message.HEADER_END_CHAR))
+        ret[Message.HEADER_SIZE : Message.HEADER_SIZE + routeLength] = routeBytes
+        ret[Message.HEADER_SIZE + routeLength: Message.HEADER_SIZE+routeLength + len(self.contentBytes)] = self.contentBytes
 
         
         ret[completeMessageSizeBytes-1] = Message.MESSAGE_END_CHAR
@@ -101,12 +84,12 @@ class Message:
         route =        bytes[Message.HEADER_SIZE              : Message.HEADER_SIZE + routeLength]
         contentBytes = bytes[Message.HEADER_SIZE + routeLength: Message.HEADER_SIZE + routeLength + contentLength]
 
-        return (completeMessageSizeBytes, Message(senderMac, route, messageType, contentBytes))
+        return (completeMessageSizeBytes, Message(senderMac, Route.fromBytes(route), messageType, contentBytes))
 
     def test():
         contentBytes = bytes((4,5,6))
         route = bytes((2,3))
-        m = Message(1, route, Message.TYPE_MESSAGE, contentBytes)
+        m = Message(1, Route.fromBytes(route), Message.TYPE_MESSAGE, contentBytes)
 
         byteMessage = m.getBytes()
 
@@ -114,13 +97,13 @@ class Message:
 
         assert(cl == Message.HEADER_SIZE + 3 + 2 + 1)
         assert(r.senderMac == m.senderMac)
-        assert(r.route[0] == m.route[0] and r.route[1] == m.route[1])
+        assert(r.route.getTarget() == m.route.getTarget() and r.route.getOrigin() == m.route.getOrigin())
         assert(r.messageType == m.messageType)
         assert(r.contentBytes[0] == m.contentBytes[0] and r.contentBytes[1] == m.contentBytes[1] and r.contentBytes[2] == m.contentBytes[2]) #<- ? comparison?
 
         toSMall = bytearray(Message.HEADER_SIZE-1)
         try:
-            Message.fromBytes(toSMall)
+            Message.getBytes(toSMall)
             assert(False)
         except Exception:
             print("Pass")

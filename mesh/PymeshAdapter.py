@@ -55,10 +55,11 @@ class PymeshAdapter:
 
             # get any data received...
             data, loraStats = lora_sock.receive()
-
+            if len(data) > 0:
+                print(data)
             this.processReceivedBytes(data, loraStats)
 
-            # wait a random amount of time
+            # wait one second
             time.sleep(1)
 
 
