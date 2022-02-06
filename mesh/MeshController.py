@@ -32,11 +32,12 @@ class MeshController:
             route = message.getRoute()
 
             self.view.receiveMessageToMe(message)    
-            route = self.router.getRoute(self.myMac, route.getOrigin())
+            #route = self.router.getRoute(self.myMac, route.getOrigin())
+            accRoute = route.getBackRoute()
 
             checksum = MessageChecksum.fromMessage(message)
             
-            self.addToQue(Message(self.myMac, route, Message.TYPE_ACC, checksum.toBytes()))
+            self.addToQue(Message(self.myMac, accRoute, Message.TYPE_ACC, checksum.toBytes()))
         elif message.isAcc():
             self.sendQue.receiveAcc(message)
             self.view.receiveAccToMe(message)
@@ -49,12 +50,17 @@ class MeshController:
         print("Target was " + str(messageFinalTarget))
         if route.IShouldRoute(message.senderMac, self.myMac):
             print("I should route...")
-            self.addToQue(Message(self.myMac, route, message.messageType, message.contentBytes))
+
+            newRoute = route.getSubRoute(message.senderMac, self.myMac)
+            self.addToQue(Message(self.myMac, newRoute, message.messageType, bytes(message.contentBytes)))
         else:
             print("I should not route...")
             self.sendQue.perhapsPartialAcc(message) 
             #I need not to send it again if I received it from someone downstream from me
-            
+        
+        if message.isAcc():
+            self.sendQue.receiveAcc(message)
+            self.view.receiveAccToMe(message)
 
 
     def getKnownNeighbors(self):

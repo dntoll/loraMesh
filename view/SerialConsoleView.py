@@ -15,11 +15,11 @@ class SerialConsoleView:
         return
 
     def receiveMessageToMe(self, message):
-        #print("to mee!")
+        print("to mee!")
         return
     
     def receiveAccToMe(self, message):
-        #print("acced")
+        print("acced")
         return
 
     def receiveMessages(self, messages):

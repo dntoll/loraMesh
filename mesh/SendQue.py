@@ -75,6 +75,7 @@ class SendQue:
     def InQue(self, message):
         messageChecksum = MessageChecksum.fromMessage(message)
         for queItem in self.sendQue:
+            #things that are acced are no longer in que and can be re-sent
             if queItem.acced:
                 continue
             if MessageChecksum.fromMessage(queItem.message).isSame(messageChecksum):
