@@ -11,6 +11,7 @@ class Router:
 
         #receivedLoraStats from lora.stats() https://docs.pycom.io/firmwareapi/pycom/network/lora/
         self.neighbors.append(message.senderMac)
+        self.neighbors.append(message.route)
 
     def getKnownRoutes(self):
         return self.neighbors
