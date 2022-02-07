@@ -23,6 +23,12 @@ class RGBView:
 
     def sendMessage(self, message):
         self._blink(3, self.GREEN)
+
+    def receivedRouteMessage(self, message):
+        self._blink(1, self.RED)
+
+    def receivedNoRouteMessage(self, message):
+        self._blink(1, self.RED)
   
     def showIps(self, ips):
         return

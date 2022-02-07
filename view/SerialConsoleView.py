@@ -1,26 +1,45 @@
+#from tabnanny import check
 from lib.Console import Console
 from lib.ANSIEscape import ANSIEscape
+from mesh.Message import Message
+from mesh.MessageChecksum import MessageChecksum
 
 
 class SerialConsoleView:
     def __init__(self):
         self.console = Console(6)
-         
+        self.console.clearScreen()
         return
 
 
     def sendMessage(self, message):
-        #print('Sending %d bytes to %s: %s' %
-        #    (len(message.contentBytes), message.getRoute().getTarget(), message.contentBytes))
+        self._printMessage("Sent ", message)
         return
 
     def receiveMessageToMe(self, message):
-        print("to mee!")
+        self._printMessage("Recv ", message)
         return
     
     def receiveAccToMe(self, message):
-        print("acced")
+        self._printMessage("Accd ", message)
         return
+    
+    def receivedRouteMessage(self, message):
+        self._printMessage("Rout ", message)
+
+    def receivedNoRouteMessage(self, message):
+        self._printMessage("Igno ", message)
+
+    def _printMessage(self, title, message):
+        strMessage = title + " "
+        strMessage += str(message.senderMac) + " "
+        strMessage += self._typeToStr(message.messageType) + " "
+        strMessage += self._routeToStr(message.getRoute()) + " "
+        strMessage += " CS[" + self._checksumToStr(MessageChecksum.fromMessage(message))  + "] "
+        strMessage += " CO[" + self._contentToStr(message.contentBytes) +"]"
+
+        print(strMessage)
+        
 
     def receiveMessages(self, messages):
         #for m in messages:
@@ -32,10 +51,32 @@ class SerialConsoleView:
         for ip in ips:
             print("Network node: %s" % 
                 (ip))
+
+    def _contentToStr(self, content):
+        return str(content)
     
+    def _checksumToStr(self, checksum):
+        return str(checksum.toBytes())
+
+    def _routeToStr(self, route):
+        routeStr = "";
+        for b in route.getBytes():
+            routeStr += "[" + str(b) + "]"
+        return routeStr
+
+    def _neighborToStr(self, neigh):
+        return str(neigh.mac) + " RSSI: " + str(neigh.rssi) + " T: " + str(neigh.time)
+
+    def _typeToStr(self, type):
+        if type == Message.TYPE_ACC:
+            return "acc"
+        
+        return "mes"
+
+
     def update(self, pymeshAdapter):
         
-        consolePosition = 100
+        consolePosition = 75
         self.console.frame(consolePosition,0, 55, 6)
         self.console.printAt("mac : " + str(pymeshAdapter.getMyAddress()), consolePosition+2, 0)
 
@@ -57,13 +98,24 @@ class SerialConsoleView:
                     color = ANSIEscape.getTextColor("Blue")
                 else:
                     color = ANSIEscape.getTextColor("Green")
-            self.console.printAt(color + str(target) + "\t"+str(furthestDownStreamMac)+"\t" + str(sentCount) + "\t" + str(isAcc) + "\t" + str(acced) + "\t" + str(contentBytes), consolePosition+2, 2+y)
+            self.console.printAt(color + str(target) + "\t\t" + str(sentCount) + "\t" + str(isAcc) + "\t" + str(acced) + "\t" + str(contentBytes), consolePosition+2, 2+y)
             y += 1
         
         self.console.buffer += ANSIEscape.getResetCode()
 
-        for route in pymeshAdapter.getKnownRoutes():
-            self.console.printAt(str(route), consolePosition+2, 2+y)
+        y += 2
+        neighbors = pymeshAdapter.getNeighbors()
+        for x in neighbors:
+            routeStr = self._neighborToStr(neighbors[x])
+            self.console.printAt(routeStr, consolePosition+2, 2+y)
+            y += 1
+        
+        y += 2
+        routes = pymeshAdapter.getRoutes()
+        for x in routes:
+            routeStr = self._routeToStr(routes[x])
+            self.console.printAt(routeStr, consolePosition+2, 2+y)
+            y += 1
 
 
         

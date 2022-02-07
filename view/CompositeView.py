@@ -19,6 +19,13 @@ class CompositeView:
         for v in self.views:
             v.receiveAccToMe(message)
     
+    def receivedRouteMessage(self, message):
+        for v in self.views:
+            v.receivedRouteMessage(message)
+
+    def receivedNoRouteMessage(self, message):
+        for v in self.views:
+            v.receivedNoRouteMessage(message)
 
     def sendMessage(self, message):
         for v in self.views:

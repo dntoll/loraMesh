@@ -28,9 +28,9 @@ class ReceiveBuffer:
                 print("not full message received")
                 break
             except Exception as err:
-                print("Exception in getBytes")
-                print(err)
-                print("Reducing received buffer -- {0}".format(err) + str(newBuffer))
+                #print("Exception in getBytes")
+                #print(err)
+                #print("Reducing received buffer -- {0}".format(err) + str(newBuffer))
                 newBuffer = newBuffer[1:]
 
         self.savedBuffer = bytearray(len(newBuffer))

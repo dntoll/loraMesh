@@ -23,7 +23,7 @@ def p():
 
 def rp():
     global a
-    m = Message(13, Route.fromBytes(bytes((13,14, 52,50))), Message.TYPE_MESSAGE, b"Routethis")
+    m = Message(54, Route.fromBytes(bytes((54,102, 101))), Message.TYPE_MESSAGE, b"Routethis")
     a.pm.meshController.addToQue(m)
 
 

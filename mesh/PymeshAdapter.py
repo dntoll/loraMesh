@@ -32,9 +32,15 @@ class PymeshAdapter:
         self.meshControllerLock.release()
         return m
 
-    def getKnownRoutes(self):
+    def getNeighbors(self):
         self.meshControllerLock.acquire(1)
-        m = self.meshController.router.getKnownRoutes()
+        m = self.meshController.router.getNeighbors()
+        self.meshControllerLock.release()
+        return m
+    
+    def getRoutes(self):
+        self.meshControllerLock.acquire(1)
+        m = self.meshController.router.getRoutes()
         self.meshControllerLock.release()
         return m
 
@@ -52,7 +58,7 @@ class PymeshAdapter:
                 lora_sock.send(m.getBytes())
                 this.view.sendMessage(m)
 
-            time.sleep(machine.rng() % 3)
+            time.sleep_ms(machine.rng() % 1000)
 
     def _listen(this, lora_sock):
         print("Start listening")
@@ -60,12 +66,9 @@ class PymeshAdapter:
 
             # get any data received...
             data, loraStats = lora_sock.receive()
-            if len(data) > 0:
-                print(data)
             this.processReceivedBytes(data, loraStats)
-
             # wait one second
-            time.sleep(1)
+            time.sleep_ms(500)
 
 
     #This is run by the receiver thread...

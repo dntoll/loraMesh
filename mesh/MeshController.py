@@ -28,15 +28,14 @@ class MeshController:
 
     def _reachedFinalTarget(self, message):
         if message.messageType is Message.TYPE_MESSAGE:
+            self.view.receiveMessageToMe(message)    
 
             route = message.getRoute()
+            newRoute = route.getSubRoute(message.senderMac, self.myMac)
 
-            self.view.receiveMessageToMe(message)    
-            #route = self.router.getRoute(self.myMac, route.getOrigin())
-            accRoute = route.getBackRoute()
-
+            accRoute = newRoute.getBackRoute()
             checksum = MessageChecksum.fromMessage(message)
-            
+
             self.addToQue(Message(self.myMac, accRoute, Message.TYPE_ACC, checksum.toBytes()))
         elif message.isAcc():
             self.sendQue.receiveAcc(message)
@@ -49,13 +48,14 @@ class MeshController:
         messageFinalTarget = route.getTarget()
         print("Target was " + str(messageFinalTarget))
         if route.IShouldRoute(message.senderMac, self.myMac):
-            print("I should route...")
-
+            
             newRoute = route.getSubRoute(message.senderMac, self.myMac)
-            self.addToQue(Message(self.myMac, newRoute, message.messageType, bytes(message.contentBytes)))
+
+            relayedMessage = Message(self.myMac, newRoute, message.messageType, bytes(message.contentBytes))
+            self.view.receivedRouteMessage(relayedMessage)
+            self.addToQue(relayedMessage)            
         else:
-            print("I should not route...")
-            self.sendQue.perhapsPartialAcc(message) 
+            self.view.receivedNoRouteMessage(message)
             #I need not to send it again if I received it from someone downstream from me
         
         if message.isAcc():

@@ -7,7 +7,7 @@ from mesh.MessageChecksum import MessageChecksum
 class QueItem:
 
     WAIT_UNTIL_RESEND_MS = 10000
-    ACC_SEND_TIMES_BEFORE_REMOVE = 3
+    MAX_SEND_TIMES = 10
 
     def __init__(self, message):
         self.acced = False
@@ -27,7 +27,10 @@ class QueItem:
         self.sentTime = now
 
         #Acces are only sent a few times
-        if self.message.isAcc() and self.sentCount >= self.ACC_SEND_TIMES_BEFORE_REMOVE:
+        if self.message.isAcc():
+            self.acced = True
+        
+        if self.sentCount > QueItem.MAX_SEND_TIMES:
             self.acced = True
 
 
@@ -46,15 +49,7 @@ class SendQue:
         for queItem in self.sendQue:
             queItem.tryAcc(message)
 
-    def perhapsPartialAcc(self, message):
-        messageChecksum = MessageChecksum.fromMessage(message)
-        for queItem in self.sendQue:
-            if MessageChecksum.fromMessage(queItem.message).isSame(messageChecksum):
-                if message.route.IShouldRoute(queItem.furthestDownStreamMac, message.senderMac):
-                    queItem.furthestDownStreamMac = message.senderMac
-
-
-
+    
     def getMessageToSend(self):
         now = utime.ticks_ms()
 
