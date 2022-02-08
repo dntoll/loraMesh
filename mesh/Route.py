@@ -7,9 +7,6 @@ class Route:
     def getBytes(self):
         return self.route
 
-    def fromBytes(bytes):
-        return Route(bytes)
-
     def getTarget(self):
         return self.route[len(self.route)-1]
 

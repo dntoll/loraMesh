@@ -1,7 +1,4 @@
 
-
-import utime
-import machine
 from mesh.MessageChecksum import MessageChecksum
 
 class QueItem:
@@ -39,8 +36,9 @@ class QueItem:
             self.acced = True
 
 class SendQue:
-    def __init__(self):
+    def __init__(self, pycomInterface):
         self.sendQue = []
+        self.pycomInterface = pycomInterface
     
     def getSendQue(self):
         return self.sendQue
@@ -51,7 +49,7 @@ class SendQue:
 
     
     def getMessageToSend(self):
-        now = utime.ticks_ms()
+        now = self.pycomInterface.ticks_ms()
 
         couldBeSent = []
         for queItem in self.sendQue:
@@ -60,7 +58,7 @@ class SendQue:
         
         if len(couldBeSent) > 0:
 
-            sendIndex = machine.rng() % len(couldBeSent)
+            sendIndex = self.pycomInterface.rng() % len(couldBeSent)
             queItem = couldBeSent[sendIndex]
             queItem.doSend(now)
             return queItem.message

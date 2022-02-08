@@ -1,10 +1,6 @@
-
-from machine import Timer
 import time
 import sys
 import struct
-import machine
-import _thread
 from mesh.Message import Message
 
 from mesh.MeshController import MeshController
@@ -13,18 +9,17 @@ from mesh.ReceiveBuffer import ReceiveBuffer
 class PymeshAdapter:
     
 
-    def __init__(self, view, socket):
+    def __init__(self, view, socket, pycomInterface):
         self.view = view
         self.socket = socket
 
         self.receiveBuffer = ReceiveBuffer()
-        self.meshController = MeshController(view, self.getMyAddress())
-        self.meshControllerLock = _thread.allocate_lock()
+        self.meshController = MeshController(view, self.getMyAddress(), pycomInterface)
+        self.meshControllerLock = pycomInterface.allocate_lock()
         
 
-        print("Starting threads on " + str(self.getMyAddress()))
-        self.listenThread = _thread.start_new_thread(PymeshAdapter._listen, (self, socket))
-        self.socketThread = _thread.start_new_thread(PymeshAdapter._sendThread, (self, socket))
+        self.listenThread = pycomInterface.start_new_thread(PymeshAdapter._listen, (self, socket, pycomInterface))
+        self.socketThread = pycomInterface.start_new_thread(PymeshAdapter._sendThread, (self, socket, pycomInterface))
 
     def getMessagesInSendQue(self):
         self.meshControllerLock.acquire(1)
@@ -45,7 +40,7 @@ class PymeshAdapter:
         return m
 
 
-    def _sendThread(this, lora_sock):
+    def _sendThread(this, lora_sock, pycomInterface):
         print("Start sending")
 
         #m =
@@ -58,9 +53,9 @@ class PymeshAdapter:
                 lora_sock.send(m.getBytes())
                 this.view.sendMessage(m)
 
-            time.sleep_ms(machine.rng() % 1000)
+            pycomInterface.sleep_ms(pycomInterface.rng() % 1000)
 
-    def _listen(this, lora_sock):
+    def _listen(this, lora_sock, pycomInterface):
         print("Start listening")
         while (True):
 
@@ -68,7 +63,7 @@ class PymeshAdapter:
             data, loraStats = lora_sock.receive()
             this.processReceivedBytes(data, loraStats)
             # wait one second
-            time.sleep_ms(500)
+            pycomInterface.sleep_ms(500)
 
 
     #This is run by the receiver thread...

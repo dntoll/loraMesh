@@ -1,5 +1,5 @@
 
-import utime
+
 from mesh.Route import Route
 
 
@@ -11,9 +11,10 @@ class Neighbor:
 
 class Router:
 
-    def __init__(self):
+    def __init__(self, pycomInterface):
         self.neighbors = {}
         self.routes = {}
+        self.pycomInterface = pycomInterface
 
     def deriveRouterData(self, message, receivedLoraStats):
 
@@ -21,9 +22,9 @@ class Router:
         
         if message.senderMac in self.neighbors:
             self.neighbors[message.senderMac].rssi = receivedLoraStats.rssi
-            self.neighbors[message.senderMac].time = utime.ticks_ms()
+            self.neighbors[message.senderMac].time = self.pycomInterface.ticks_ms()
         else:
-            self.neighbors[message.senderMac] = Neighbor(message.senderMac, receivedLoraStats.rssi, utime.ticks_ms())
+            self.neighbors[message.senderMac] = Neighbor(message.senderMac, receivedLoraStats.rssi, self.pycomInterface.ticks_ms())
         
 
         self.routes[str(message.route.getBytes())] = message.route
@@ -42,4 +43,4 @@ class Router:
         route = bytearray(2)
         route[0] = fromMac
         route[1] = toMac
-        return Route.fromBytes(route)
+        return Route(bytes(route))

@@ -6,9 +6,9 @@ from mesh.MessageChecksum import MessageChecksum
 #this class implements the mesh network protocol
 class MeshController:
 
-    def __init__(self, view, myMac):
-        self.sendQue = SendQue()
-        self.router = Router()
+    def __init__(self, view, myMac, pycomInterface):
+        self.sendQue = SendQue(pycomInterface)
+        self.router = Router(pycomInterface)
         
         self.view = view
         self.myMac = myMac

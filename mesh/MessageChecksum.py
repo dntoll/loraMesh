@@ -10,9 +10,6 @@ class MessageChecksum:
 
     def toBytes(self):
         return self.checksum
-
-    def fromBytes(bytes):
-        return MessageChecksum(bytes)
     
     def fromMessage(message):
         target = message.route.getTarget()
