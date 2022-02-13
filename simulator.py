@@ -27,7 +27,7 @@ for i in range(3):
 clients[0].sendMessage(2, b"hello")
 clients[2].sendMessage(0, b"hello")
 
-for i in range(5):
+for i in range(30):
     
     radio.process()
     sleep(1)

@@ -3,6 +3,7 @@ import _thread
 
 from mesh.PymeshAdapter import PymeshAdapter
 from mesh.ThreadSafeLoraSocket import ThreadSafeLoraSocket
+from mesh.PycomInterface import PycomInterface
 
 from view.CompositeView import CompositeView
 from view.RGBView import RGBView
@@ -21,7 +22,7 @@ class AppController:
         self.view.add(RGBView())
         self.view.add(SerialConsoleView())
         
-        self.pm = PymeshAdapter(self.view, ThreadSafeLoraSocket())
+        self.pm = PymeshAdapter(self.view, ThreadSafeLoraSocket(), PycomInterface())
 
     def run(self):
         #Want to run the loop in a separate thread to make sure we can interract with the app on this one

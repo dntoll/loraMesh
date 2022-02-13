@@ -107,7 +107,7 @@ class Message:
     def test():
         contentBytes = bytes((4,5,6))
         route = bytes((2,3))
-        m = Message(1, Route.fromBytes(route), Message.TYPE_MESSAGE, contentBytes)
+        m = Message(1, Route(route), Message.TYPE_MESSAGE, contentBytes)
 
         byteMessage = m.getBytes()
 
