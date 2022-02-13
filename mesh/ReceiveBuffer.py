@@ -1,5 +1,6 @@
 
 from mesh.Message import ToShortMessageException
+from mesh.Message import NotAMessageException
 from mesh.Message import Message
 
 class ReceiveBuffer:
@@ -27,9 +28,12 @@ class ReceiveBuffer:
             except ToShortMessageException:
                 print("not full message received")
                 break
+            except NotAMessageException:
+                print("not a message")
+                break
             except Exception as err:
-                #print("Exception in getBytes")
-                #print(err)
+                print("Exception in getBytes")
+                print(err)
                 #print("Reducing received buffer -- {0}".format(err) + str(newBuffer))
                 newBuffer = newBuffer[1:]
 

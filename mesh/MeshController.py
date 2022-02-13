@@ -14,6 +14,7 @@ class MeshController:
         self.myMac = myMac
 
     def onReceive(self, message, loraStats):
+        
         self.router.deriveRouterData(message, loraStats)
 
         route = message.getRoute()

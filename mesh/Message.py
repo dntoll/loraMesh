@@ -5,7 +5,9 @@ class ToShortMessageException(Exception):
     def __init__(self, text):
         super().__init__(text)
 
-
+class NotAMessageException(Exception):
+    def __init__(self, text):
+        super().__init__(text)
 
 
 class Message:
@@ -50,7 +52,7 @@ class Message:
 
     #is self a checksum
     def isAccOf(self, message):
-        accChecksum = MessageChecksum.fromBytes(self.contentBytes)
+        accChecksum = MessageChecksum(self.contentBytes)
         message = MessageChecksum.fromMessage(message)
         return accChecksum.isSame(message)
     
@@ -73,14 +75,14 @@ class Message:
 
     def fromBytes(bytes):
         if len(bytes) < Message.HEADER_SIZE:
-            raise Exception("to small to be a message")
+            raise NotAMessageException("to small to be a message")
 
         headerBegin = bytes[Message.HEADER_BEGIN]
         if headerBegin != Message.HEADER_BEGIN_CHAR:
-            raise Exception("headers should begin with " + chr(Message.HEADER_BEGIN_CHAR))
+            raise NotAMessageException("headers should begin with " + chr(Message.HEADER_BEGIN_CHAR))
         
         if bytes[Message.HEADER_END] != Message.HEADER_END_CHAR:
-            raise Exception("headers should end with " + chr(Message.HEADER_END_CHAR) + " was " + str(bytes[Message.HEADER_END]))
+            raise NotAMessageException("headers should end with " + chr(Message.HEADER_END_CHAR) + " was " + str(bytes[Message.HEADER_END]))
 
 
         
@@ -94,13 +96,13 @@ class Message:
             raise ToShortMessageException("not enough data in Buffer, perhaps not full message received")
         
         if bytes[completeMessageSizeBytes-1] != Message.MESSAGE_END_CHAR:
-            raise Exception("Messages should end with " + chr(Message.MESSAGE_END_CHAR))
+            raise NotAMessageException("Messages should end with " + chr(Message.MESSAGE_END_CHAR))
 
         
         route =        bytes[Message.HEADER_SIZE              : Message.HEADER_SIZE + routeLength]
         contentBytes = bytes[Message.HEADER_SIZE + routeLength: Message.HEADER_SIZE + routeLength + contentLength]
 
-        return (completeMessageSizeBytes, Message(senderMac, Route.fromBytes(route), messageType, contentBytes))
+        return (completeMessageSizeBytes, Message(senderMac, Route(route), messageType, contentBytes))
 
     def test():
         contentBytes = bytes((4,5,6))

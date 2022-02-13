@@ -51,6 +51,6 @@ class Route:
             if foundMe: #include me and all after
                 ret.append(ref)
 
-        return Route.fromBytes(bytes(ret))
+        return Route(bytes(ret))
 
     
