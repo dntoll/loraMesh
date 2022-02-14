@@ -23,7 +23,13 @@ class Route:
 
         return Route(bytes(reversed))
     
-    def IShouldRoute(self, senderOfMessage, potentialRouterMac):
+    def notInRoute(self, mac):
+        for ref in self.route:
+            if ref == mac:
+                return False
+        return True
+    
+    def bothInRouteAndOrdered(self, senderOfMessage, potentialRouterMac):
         foundSender = False
         for ref in self.route:
             if ref == senderOfMessage:
@@ -36,7 +42,7 @@ class Route:
         return False
 
     #We can remove all not needed steps between sender and myMac
-    def getSubRoute(self, senderOfMessage, myMac):
+    def getShortenedRoute(self, senderOfMessage, myMac):
 
         ret = []
         foundSender = False
@@ -51,6 +57,35 @@ class Route:
             if foundMe: #include me and all after
                 ret.append(ref)
 
+        return Route(bytes(ret))
+
+    def getSubRoute(self, fromMac, toMac):
+        ret = []
+        foundSender = False
+        for ref in self.route:
+            if ref is fromMac:
+                foundSender = True
+            if foundSender:
+                ret.append(ref) #include all up until and including sender
+            if ref is toMac:
+                break
+
+        return Route(bytes(ret))
+
+    def expandTail(self, tailRoute):
+        target = self.getTarget()
+
+        ret = []
+        foundTarget = False
+        for ref in self.route:
+            if ref is target:
+                break
+            if not foundTarget:
+                ret.append(ref)
+        
+        for ref in tailRoute.route:
+            ret.append(ref)
+        
         return Route(bytes(ret))
 
     

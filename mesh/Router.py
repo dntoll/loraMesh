@@ -20,7 +20,7 @@ class Router:
 
         #receivedLoraStats from lora.stats() https://docs.pycom.io/firmwareapi/pycom/network/lora/
         
-        if message.senderMac in self.neighbors:
+        if self.macIsNeighbour(message.senderMac): #update knowledge
             self.neighbors[message.senderMac].rssi = receivedLoraStats.rssi
             self.neighbors[message.senderMac].time = self.pycomInterface.ticks_ms()
         else:
@@ -29,6 +29,7 @@ class Router:
 
         self.routes[str(message.route.getBytes())] = message.route
 
+        #this might not be valid since some might send more strongly than others
         backRoute = message.route.getBackRoute()
         self.routes[str(backRoute.getBytes())] =backRoute
         
@@ -40,7 +41,36 @@ class Router:
         return self.neighbors
 
     def getRoute(self, fromMac, toMac):
-        route = bytearray(2)
-        route[0] = fromMac
-        route[1] = toMac
-        return Route(bytes(route))
+        if self.macIsNeighbour(toMac):
+            route = bytearray(2)
+            route[0] = fromMac
+            route[1] = toMac
+            return Route(bytes(route))
+        
+        for route in self.routes:
+            if self.routes[route].bothInRouteAndOrdered(fromMac, toMac):
+                return self.routes[route].getSubRoute(fromMac, toMac)
+        
+        raise Exception("No route found")
+        
+
+    def hasRoute(self, fromMac, toMac):
+        if self.macIsNeighbour(toMac):
+            return True
+        
+        if self.iHaveSeenRoute(fromMac, toMac):
+            return True
+        
+        return False
+    
+    def macIsNeighbour(self, mac):
+        if mac in self.neighbors:
+            return True
+        return False
+    
+    def iHaveSeenRoute(self, fromMac, toMac):
+        for route in self.routes:
+            if self.routes[route].bothInRouteAndOrdered(fromMac, toMac):
+                return True
+        
+        return False

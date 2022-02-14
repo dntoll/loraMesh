@@ -46,6 +46,9 @@ class Message:
 
     def isAcc(self):
         return self.messageType == Message.TYPE_ACC
+    
+    def isFind(self):
+        return self.messageType == Message.TYPE_FIND
 
     def getRoute(self):
         return self.route

@@ -5,6 +5,7 @@ from mesh.Message import Message
 
 from mesh.MeshController import MeshController
 from mesh.ReceiveBuffer import ReceiveBuffer
+from mesh.Route import Route
 
 class PymeshAdapter:
     
@@ -84,8 +85,12 @@ class PymeshAdapter:
     def sendMessage(self, target_ip, message):
         self.meshControllerLock.acquire(1)
 
-        route = self.meshController.router.getRoute(self.getMyAddress(), target_ip)
-        m = Message(self.getMyAddress(), route, Message.TYPE_MESSAGE, message)
+        if self.meshController.router.hasRoute(self.getMyAddress(), target_ip):
+            route = self.meshController.router.getRoute(self.getMyAddress(), target_ip)
+            m = Message(self.getMyAddress(), route, Message.TYPE_MESSAGE, message)
+        else:
+            route = Route(bytes([self.getMyAddress(), target_ip]))
+            m = Message(self.getMyAddress(), route, Message.TYPE_FIND, message)
         self.meshController.addToQue(m)
 
         self.meshControllerLock.release()
