@@ -40,8 +40,8 @@ class MeshController:
 
             self.addToQue(Message(self.myMac, accRoute, Message.TYPE_ACC, checksum.toBytes()))
         elif message.isAcc():
-            self.sendQue.receiveAcc(message)
-            self.view.receiveAccToMe(message)
+            if self.sendQue.receiveAcc(message):
+                self.view.receiveAccToMe(message)
 
     def _receivedMessageMeantForOther(self, message):    
 
@@ -72,8 +72,10 @@ class MeshController:
             self.view.receivedNoRouteMessage(message)
 
         if message.isAcc():
-            self.sendQue.receiveAcc(message)
-            self.view.receiveAccToMe(message)
+            if self.sendQue.receiveAcc(message):
+                self.view.receiveAccToOther(message)
+                relayedMessage = Message(self.myMac, message.getRoute(), Message.TYPE_ACC, bytes(message.contentBytes))
+                self.addToQue(relayedMessage)
 
     def getKnownNeighbors(self):
         return self.neighbors

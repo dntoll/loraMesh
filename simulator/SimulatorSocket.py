@@ -49,7 +49,7 @@ class SimulatorSocket:
 		distx = (self.posx - other.posx)**2
 		disty = (self.posy - other.posy)**2
 
-		return math.sqrt(distx+disty) <= 1.1
+		return math.sqrt(distx+disty) <= 2.1
 
 
 

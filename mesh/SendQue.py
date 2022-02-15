@@ -6,17 +6,23 @@ class QueItem:
     WAIT_UNTIL_RESEND_MS = 10000
     MAX_SEND_TIMES = 10
 
-    def __init__(self, message):
+    def __init__(self, message, sendEarliestAt):
         self.acced = False
         self.sentCount = 0
+        self.sentTime = sendEarliestAt
         self.message = message
+        self.sendEarliestAt = sendEarliestAt
         self.furthestDownStreamMac = self.message.senderMac
 
     def shouldBeSent(self, now):
         if self.acced == False:
             jumps = self.message.route.getNumberOfJumps()
-            if self.sentCount == 0 or now - self.sentTime > jumps * self.WAIT_UNTIL_RESEND_MS:
+
+            #delay find-messages
+            if (self.sentCount == 0 and self.sendEarliestAt < now ) or now - self.sentTime > jumps * self.WAIT_UNTIL_RESEND_MS:
                 return True
+
+            
         return False
     
     def doSend(self, now):
@@ -33,9 +39,14 @@ class QueItem:
 
     def tryAcc(self, accMessage):
         if accMessage.isAccOf(self.message):
-            self.acced = True
+            if self.acced is False:
+                self.acced = True
+                return True
+        return False
 
 class SendQue:
+    MAX_WAIT_FOR_FIND = 100
+
     def __init__(self, pycomInterface):
         self.sendQue = []
         self.pycomInterface = pycomInterface
@@ -44,8 +55,11 @@ class SendQue:
         return self.sendQue
 
     def receiveAcc(self, message):
+        didAcc = False
         for queItem in self.sendQue:
-            queItem.tryAcc(message)
+            if queItem.tryAcc(message):
+                didAcc = True
+        return didAcc
 
     
     def getMessageToSend(self):
@@ -77,5 +91,12 @@ class SendQue:
         return False
 
     def addToQue(self, message):
+        
         if not self.InQue(message):
-            self.sendQue.append(QueItem(message))
+            sendAtTime = self.pycomInterface.ticks_ms()
+
+            #delay finds
+            if message.isFind():
+                sendAtTime += self.pycomInterface.rng() % SendQue.MAX_WAIT_FOR_FIND 
+
+            self.sendQue.append(QueItem(message, sendAtTime))

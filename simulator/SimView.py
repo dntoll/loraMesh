@@ -1,13 +1,15 @@
-
+from lib.ANSIEscape import ANSIEscape
 
 class SimView:
     
     def __init__(self, nodeName):
-        self.nodeName = nodeName
+        self.nodeName = str(nodeName) + ": "
+        self.nodeID = nodeName
     
     def receiveMessages(self, messages):
-        if len(messages) > 0:
-            print(self.nodeName + "receiveMessages", flush=True)
+        #if len(messages) > 0:
+        #    print(self.nodeName + "receiveMessages", flush=True)
+        return
 
     def receiveMessageToMe(self, message):
         self.printMessage("receiveMessageToMe", message)
@@ -36,22 +38,29 @@ class SimView:
         self.printMessage("suggestRoute", message)
     def passOnFindMessage(self, message):
         self.printMessage("passOnFindMessage", message)
+    def receiveAccToOther(self, message):
+        self.printMessage("receiveAccToOther", message)
 
         
 
     def printMessage(self, title, message):
         r = message.getRoute()
         t = message.messageType
+        s = message.senderMac
         if message.isAcc():
             t = "acc"
         elif message.isFind():
             t = "find"
         
-        print(self.nodeName + title + self._routeToStr(r) + " " + str(t), flush=True)
+        
+        print(self.nodeName + title + "(" + str(s) + ")" + self._routeToStr(r) + " " + str(t), flush=True)
 
     
     def _routeToStr(self, route):
         routeStr = "";
         for b in route.getBytes():
-            routeStr += "[" + str(b) + "]"
+            if b is self.nodeID:
+                routeStr += ANSIEscape.getTextColor("Green") + "[" + str(b) + "]"+ ANSIEscape.getResetCode() 
+            else:
+                routeStr += "[" + str(b) + "]"
         return routeStr

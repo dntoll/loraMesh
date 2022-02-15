@@ -1,6 +1,7 @@
 class Radio:
     def __init__(self):
         self.nodes = []
+        self.sends = 0
     
 
     def add(self, node):
@@ -10,6 +11,7 @@ class Radio:
         for ss in self.nodes:
             #check outgoing
             if len(ss.sendBuffer):
+                self.sends += 1
                 self.sendToAllButMe(ss, ss.sendBuffer)
                 ss.clearSendBuffer()
     
