@@ -6,9 +6,11 @@ from simulator.SimulatorSocket import SimulatorSocket
 from simulator.FakePycomInterface import FakePycomInterface
 from simulator.Radio import Radio
 from simulator.SimView import SimView
+from simulator.SimTest import SimTest
+from mesh.Message import Message
 from time import sleep
 
-
+"""
 view = CompositeView()
 radio = Radio()
 fpi = FakePycomInterface()
@@ -21,10 +23,9 @@ for i in range(25):
     y = i/5
     socket = SimulatorSocket(i, x, y)
     radio.add(socket)
-
     clients.append(PymeshAdapter(sv, socket, fpi))
 
-clients[0].sendMessage(24, b"first")
+clients[0].sendMessage(3, b"first")
 #clients[2].sendMessage(0, b"hello")
 
 timePerStep = 0.01
@@ -36,42 +37,31 @@ for i in range(int(10.0/timePerStep)):
     if oneTime and i > int(5/timePerStep):
         print("Send")
         oneTime = False
-        clients[0].sendMessage(14, b"second")
+        clients[3].sendMessage(0, b"firest")
 print("ended tests")
 
 fpi.die()
 print("tried to release threads")
 
 print(radio.sends)
+"""
+st = SimTest()
+st.add(1, 0, 0)
+st.add(2, 1, 0)
 
+st.send(1, 2, b"h")
+st.wait(0.2)
+st.assertListen(2, Message.TYPE_FIND, b"h")
+st.assertListen(1, Message.TYPE_ACC, b"h")
+st.endSim()
 
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import networkx as nx
+st = SimTest()
+st.add(1, 0, 0)
+st.add(2, 1, 0)
+st.add(3, 2, 0)
 
-seed = 13648  # Seed random number generators for reproducibility
-G = nx.grid_2d_graph(5, 5)
-pos = nx.spring_layout(G, seed=seed)
-
-node_sizes = [3 + 10 * i for i in range(len(G))]
-M = G.number_of_edges()
-edge_colors = range(2, M + 2)
-edge_alphas = [(5 + i) / (M + 4) for i in range(M)]
-cmap = plt.cm.plasma
-
-nodes = nx.draw_networkx_nodes(G, pos, node_size=node_sizes, node_color="indigo")
-edges = nx.draw_networkx_edges(
-    G,
-    pos,
-    node_size=node_sizes,
-    arrowstyle="->",
-    arrowsize=10,
-    edge_color=edge_colors,
-    edge_cmap=cmap,
-    width=2,
-)
-# set alpha value for each edge
-
-ax = plt.gca()
-ax.set_axis_off()
-plt.show()
+st.send(1, 3, b"h")
+st.wait(0.2)
+st.assertListen(2, Message.TYPE_FIND, b"h")
+st.assertListen(1, Message.TYPE_ACC, b"h")
+st.endSim()
