@@ -12,6 +12,9 @@ Favor best route
 # Console View
 Sent Messages and their que + acc status
 
+# send que
+delay find messages so that they can be acced before
+
 
 ## Automated test-cases for simulation.
 

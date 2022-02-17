@@ -45,6 +45,7 @@ class QueItem:
         return False
 
 class SendQue:
+    MIN_WAIT_FOR_FIND = 20
     MAX_WAIT_FOR_FIND = 100
 
     def __init__(self, pycomInterface):
@@ -83,12 +84,25 @@ class SendQue:
         messageChecksum = MessageChecksum.fromMessage(message)
         for queItem in self.sendQue:
             #things that are acced are no longer in que and can be re-sent
-            if queItem.acced:
-                continue
+            #if queItem.acced:
+            #    continue
             if MessageChecksum.fromMessage(queItem.message).isSame(messageChecksum):
                 return True
 
         return False
+    
+    def getQueItemByMessage(self, message):
+        messageChecksum = MessageChecksum.fromMessage(message)
+        for queItem in self.sendQue:
+            #things that are acced are no longer in que and can be re-sent
+            #if queItem.acced:
+            #    continue
+            if MessageChecksum.fromMessage(queItem.message).isSame(messageChecksum):
+                return queItem
+
+        raise Exception("We should not ask for a message not in que")
+    
+    
 
     def addToQue(self, message):
         
@@ -97,6 +111,11 @@ class SendQue:
 
             #delay finds
             if message.isFind():
-                sendAtTime += self.pycomInterface.rng() % SendQue.MAX_WAIT_FOR_FIND 
+                sendAtTime += SendQue.MIN_WAIT_FOR_FIND + self.pycomInterface.rng() % SendQue.MAX_WAIT_FOR_FIND 
 
             self.sendQue.append(QueItem(message, sendAtTime))
+        else:
+            if message.isFind():
+                originalMessageQueItem = self.getQueItemByMessage(message)
+                originalMessageQueItem.sendEarliestAt += SendQue.MIN_WAIT_FOR_FIND + self.pycomInterface.rng() % SendQue.MAX_WAIT_FOR_FIND 
+                #print("Delayed find in que")

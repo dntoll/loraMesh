@@ -54,7 +54,7 @@ class PymeshAdapter:
                 lora_sock.send(m.getBytes())
                 this.view.sendMessage(m)
 
-            pycomInterface.sleep_ms(pycomInterface.rng() % 1000)
+            pycomInterface.sleep_ms(pycomInterface.rng() % 10)
 
     def _listen(this, lora_sock, pycomInterface):
         print("Start listening")
@@ -64,7 +64,7 @@ class PymeshAdapter:
             data, loraStats = lora_sock.receive()
             this.processReceivedBytes(data, loraStats)
             # wait one second
-            pycomInterface.sleep_ms(500)
+            pycomInterface.sleep_ms(5)
 
 
     #This is run by the receiver thread...
