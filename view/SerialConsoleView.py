@@ -29,6 +29,15 @@ class SerialConsoleView:
 
     def receivedNoRouteMessage(self, message):
         self._printMessage("Igno ", message)
+    
+    def receivedFindMessage(self, message):
+        self._printMessage("receivedFindMessage ", message)
+    def suggestRoute(self, message):
+        self._printMessage("suggestRoute ", message)
+    def passOnFindMessage(self, message):
+        self._printMessage("passOnFindMessage ", message)
+    def receiveAccToOther(self, message):
+        self._printMessage("receiveAccToOther ", message)
 
     def _printMessage(self, title, message):
         strMessage = title + " "
@@ -70,6 +79,8 @@ class SerialConsoleView:
     def _typeToStr(self, type):
         if type == Message.TYPE_ACC:
             return "acc"
+        if type == Message.TYPE_FIND:
+            return "fin"
         
         return "mes"
 
@@ -86,7 +97,7 @@ class SerialConsoleView:
         for queItem in pymeshAdapter.getMessagesInSendQue():
             target = queItem.message.route.getTarget()
             contentBytes = queItem.message.contentBytes
-            isAcc = queItem.message.isAcc()
+            isAcc = self._typeToStr(queItem.message.messageType)
             sentCount = queItem.sentCount
             acced = queItem.acced
             furthestDownStreamMac = queItem.furthestDownStreamMac

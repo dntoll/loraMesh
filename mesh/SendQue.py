@@ -19,7 +19,7 @@ class QueItem:
             jumps = self.message.route.getNumberOfJumps()
 
             #delay find-messages
-            if (self.sentCount == 0 and self.sendEarliestAt < now ) or now - self.sentTime > jumps * self.WAIT_UNTIL_RESEND_MS:
+            if (self.sentCount == 0 and self.sendEarliestAt < now ) or (self.sentCount > 0 and now - self.sentTime > jumps * self.WAIT_UNTIL_RESEND_MS):
                 return True
 
             

@@ -38,3 +38,16 @@ class CompositeView:
     def update(self, pymeshAdapter):
         for v in self.views:
             v.update(pymeshAdapter)
+    
+    def receivedFindMessage(self, message):
+        for v in self.views:
+            v.receivedFindMessage(message)
+    def suggestRoute(self, message):
+        for v in self.views:
+            v.suggestRoute(message)
+    def passOnFindMessage(self, message):
+        for v in self.views:
+            v.passOnFindMessage(message)
+    def receiveAccToOther(self, message):
+        for v in self.views:
+            v.receiveAccToOther(message)

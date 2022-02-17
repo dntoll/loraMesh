@@ -11,9 +11,10 @@ class Neighbor:
 
 class Router:
 
-    def __init__(self, pycomInterface):
+    def __init__(self, pycomInterface, myMac):
         self.neighbors = {}
         self.routes = {}
+        self.myMac = myMac
         self.pycomInterface = pycomInterface
 
     def deriveRouterData(self, message, receivedLoraStats):
@@ -26,12 +27,18 @@ class Router:
         else:
             self.neighbors[message.senderMac] = Neighbor(message.senderMac, receivedLoraStats.rssi, self.pycomInterface.ticks_ms())
         
-
-        self.routes[str(message.route.getBytes())] = message.route
+        #Vi kan bara ha koll på den delen som går fram till oss eller sändaren, dvs verifierade router
+        if message.route.notInRoute(self.myMac):
+            verifiedRoute = message.route.getUpUntil(message.senderMac) #kan vi veta att sändaren finns med?
+            verifiedRoute.addToEnd(self.myMac) #eftersom vi tagit emot detta så kan vi lägga till oss på slutet.
+            self.routes[str(verifiedRoute.getBytes())] = verifiedRoute
+        else:
+            verifiedRoute = message.route.getUpUntil(self.myMac)
+            self.routes[str(verifiedRoute.getBytes())] = verifiedRoute
 
         #this might not be valid since some might send more strongly than others
-        backRoute = message.route.getBackRoute()
-        self.routes[str(backRoute.getBytes())] =backRoute
+        #backRoute = message.route.getBackRoute()
+        #self.routes[str(backRoute.getBytes())] =backRoute
         
     
     def getRoutes(self):

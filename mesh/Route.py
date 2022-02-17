@@ -28,6 +28,9 @@ class Route:
             if ref == mac:
                 return False
         return True
+
+    def getUpUntil(self, endMac):
+        return self.getSubRoute(self.getOrigin(), endMac)
     
     def bothInRouteAndOrdered(self, senderOfMessage, potentialRouterMac):
         foundSender = False
@@ -70,6 +73,13 @@ class Route:
             if ref is toMac:
                 break
 
+        return Route(bytes(ret))
+
+    def addToEnd(self, newTarget):
+        ret = []
+        for ref in self.route:
+            ret.append(ref)
+        ret.append(newTarget)
         return Route(bytes(ret))
 
     def expandTail(self, tailRoute):

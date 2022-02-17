@@ -29,6 +29,15 @@ class RGBView:
 
     def receivedNoRouteMessage(self, message):
         self._blink(1, self.RED)
+
+    def receivedFindMessage(self, message):
+        self._blink(1, self.RED)
+    def suggestRoute(self, message):
+        self._blink(1, self.RED)
+    def passOnFindMessage(self, message):
+        self._blink(1, self.RED)
+    def receiveAccToOther(self, message):
+        self._blink(1, self.RED)
   
     def showIps(self, ips):
         return

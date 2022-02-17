@@ -9,10 +9,11 @@ class MeshController:
 
     def __init__(self, view, myMac, pycomInterface):
         self.sendQue = SendQue(pycomInterface)
-        self.router = Router(pycomInterface)
+        self.router = Router(pycomInterface, myMac)
+        self.myMac = myMac
         
         self.view = view
-        self.myMac = myMac
+        
 
     def onReceive(self, message, loraStats):
         

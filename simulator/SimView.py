@@ -21,7 +21,8 @@ class SimView:
         self.printMessage("receivedRouteMessage", message)
 
     def receivedNoRouteMessage(self, message):
-        self.printMessage("receivedNoRouteMessage", message)
+        #self.printMessage("receivedNoRouteMessage", message)
+        return
 
     def sendMessage(self, message):
         self.printMessage("sendMessage", message)
