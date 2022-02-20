@@ -84,7 +84,7 @@ def test_sendBeteweenFourNodes():
 def test_secondMessageHasRoute():
     st = SimTest()
     nodeOnePos = 0
-    maxRange 1
+    maxRange =1
     st.add(1, nodeOnePos, 0)
     st.add(2, nodeOnePos + maxRange, 0)
     st.add(3, nodeOnePos + maxRange * 2, 0)
