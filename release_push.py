@@ -54,42 +54,44 @@ class FTPPusher:
 
     def push(this, that):
         try:
-            with FTP(this.clientID, timeout=10) as ftp:
-                mypath = "."
-                ftp.login(user=this.username, passwd=this.password)
-                ftp.cwd('flash')
-
-                for (dirpath, dirnames, filenames) in walk(mypath):
-                    disallowedFolders = [".\.git", "__pycache__", "simulator", ".pytest_cache"]
-
-                    doIncludeFolder = True
-                    for notAllowed in disallowedFolders:
-                        if notAllowed in dirpath:
-                            doIncludeFolder = False
-
-                    if doIncludeFolder:
-                        print("Dirpath:" + dirpath)
-                        if "." == dirpath:
-                            FTPPusher._pushAllPyFiles(ftp, dirpath, filenames)
-                        elif ".\\" in dirpath: #dont push .git
-                            dirName = dirpath[2:]
-                            onDeviceDirName = 'flash' + "/" + dirName
-
-                            ftp.cwd("..") # step out of flash
-                            try:
-                                ftp.mkd(onDeviceDirName)
-                                print("mkdir " + onDeviceDirName)
-                            except:
-                                print("dir exists")
-
-                            ftp.cwd(onDeviceDirName)
-                            FTPPusher._pushAllPyFiles(ftp, dirpath, filenames)
-                            ftp.cwd("..") #step out to flash
-                ftp.close()
+            FTPPusher.pushFolders(this)
             a = Telnet(this.clientID,this.username, this.password, b"machine.reset()")
         except:
             print("FTP Exception on client " + this.clientID)
-        
+    
+    def pushFolders(this):
+        with FTP(this.clientID, timeout=10) as ftp:
+            mypath = "."
+            ftp.login(user=this.username, passwd=this.password)
+            ftp.cwd('flash')
+
+            for (dirpath, dirnames, filenames) in walk(mypath):
+                disallowedFolders = [".\.git", "__pycache__", "simulator", ".pytest_cache"]
+
+                doIncludeFolder = True
+                for notAllowed in disallowedFolders:
+                    if notAllowed in dirpath:
+                        doIncludeFolder = False
+
+                if doIncludeFolder:
+                    print("Dirpath:" + dirpath)
+                    if "." == dirpath:
+                        FTPPusher._pushAllPyFiles(ftp, dirpath, filenames)
+                    elif ".\\" in dirpath: #dont push .git
+                        dirName = dirpath[2:]
+                        onDeviceDirName = 'flash' + "/" + dirName
+
+                        ftp.cwd("..") # step out of flash
+                        try:
+                            ftp.mkd(onDeviceDirName)
+                            print("mkdir " + onDeviceDirName)
+                        except:
+                            print("dir exists")
+
+                        ftp.cwd(onDeviceDirName)
+                        FTPPusher._pushAllPyFiles(ftp, dirpath, filenames)
+                        ftp.cwd("..") #step out to flash
+            ftp.close()
         
             
 
