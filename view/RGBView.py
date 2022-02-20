@@ -13,7 +13,8 @@ class RGBView:
         pycom.heartbeat(False)
     
     def receiveMessages(self, messages):
-        self._blink(1, self.BLUE)
+        #self._blink(1, self.BLUE)
+        return
 
     def receiveMessageToMe(self, message):
         self._blink(1, self.RED)
@@ -38,13 +39,10 @@ class RGBView:
         self._blink(1, self.RED)
     def receiveAccToOther(self, message):
         self._blink(1, self.RED)
-  
-    def showIps(self, ips):
-        return
     
     def update(self, pymeshAdapter):
         return
-
+  
     def _blink(self, times, color):
         for _ in range(times):
             pycom.rgbled(color)

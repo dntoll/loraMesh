@@ -55,11 +55,7 @@ class SerialConsoleView:
         #    print('Incoming %d bytes from %s: %s' %
         #        (len(m.contentBytes), m.senderMac, m.contentBytes))
         return
-   
-    def showIps(self, ips):
-        for ip in ips:
-            print("Network node: %s" % 
-                (ip))
+
 
     def _contentToStr(self, content):
         return str(content)

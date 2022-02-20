@@ -1,10 +1,12 @@
 from lib.ANSIEscape import ANSIEscape
 
-class SimView:
+
+class SimTestView:
     
     def __init__(self, nodeName):
         self.nodeName = str(nodeName) + ": "
         self.nodeID = nodeName
+        self.buffer = []
     
     def receiveMessages(self, messages):
         #if len(messages) > 0:
@@ -12,35 +14,49 @@ class SimView:
         return
 
     def receiveMessageToMe(self, message):
-        self.printMessage("receiveMessageToMe", message)
+        self.processMessage("receiveMessageToMe", message)
     
     def receiveAccToMe(self, message):
-        self.printMessage("receiveAccToMe", message)
+        self.processMessage("receiveAccToMe", message)
     
     def receivedRouteMessage(self, message):
-        self.printMessage("receivedRouteMessage", message)
+        self.processMessage("receivedRouteMessage", message)
 
     def receivedNoRouteMessage(self, message):
-        #self.printMessage("receivedNoRouteMessage", message)
+        self.processMessage("receivedNoRouteMessage", message)
         return
 
     def sendMessage(self, message):
-        self.printMessage("sendMessage", message)
-    
-  
-    def receivedFindMessage(self, message):
-        self.printMessage("receivedFindMessage", message)
-    def suggestRoute(self, message):
-        self.printMessage("suggestRoute", message)
-    def passOnFindMessage(self, message):
-        self.printMessage("passOnFindMessage", message)
-    def receiveAccToOther(self, message):
-        self.printMessage("receiveAccToOther", message)
-
+        self.processMessage("sendMessage", message)
+       
     def update(self, pymeshAdapter):
+        #print(self.nodeName + "update", flush=True)
         return
+    
+    def receivedFindMessage(self, message):
+        self.processMessage("receivedFindMessage", message)
+    def suggestRoute(self, message):
+        self.processMessage("suggestRoute", message)
+    def passOnFindMessage(self, message):
+        self.processMessage("passOnFindMessage", message)
+    def receiveAccToOther(self, message):
+        self.processMessage("receiveAccToOther", message)
 
-    def printMessage(self, title, message):
+        
+
+    def processMessage(self, title, message):
+        self.buffer.append(message)
+        self._printMessage(title, message)
+
+    def hasMessage(self, messageType):
+        for message in self.buffer:
+            if message.messageType == messageType:
+                return True
+        return False
+
+
+
+    def _printMessage(self, title, message):
         r = message.getRoute()
         t = message.messageType
         s = message.senderMac
@@ -54,7 +70,7 @@ class SimView:
         
         print(self.nodeName + title + "(" + str(s) + ")" + self._routeToStr(r) + " " + str(t), flush=True)
 
-    
+    #TODO: copy paste
     def _routeToStr(self, route):
         routeStr = "";
         for b in route.getBytes():

@@ -42,9 +42,6 @@ class PymeshAdapter:
 
 
     def _sendThread(this, lora_sock, pycomInterface):
-        print("Start sending")
-
-        #m =
         while (True):
             this.meshControllerLock.acquire(1)
             m = this.meshController.getSendQue().getMessageToSend()
@@ -57,7 +54,6 @@ class PymeshAdapter:
             pycomInterface.sleep_ms(pycomInterface.rng() % 10)
 
     def _listen(this, lora_sock, pycomInterface):
-        print("Start listening")
         while (True):
 
             # get any data received...

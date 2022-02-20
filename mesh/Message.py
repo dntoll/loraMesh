@@ -15,7 +15,6 @@ class Message:
     TYPE_MESSAGE = 0
     TYPE_ACC = 1
     TYPE_FIND = 2
-
     
     HEADER_BEGIN_CHAR = ord('#')
     HEADER_END_CHAR = ord('>')

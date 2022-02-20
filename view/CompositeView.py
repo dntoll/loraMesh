@@ -31,10 +31,6 @@ class CompositeView:
         for v in self.views:
             v.sendMessage(message)
     
-    def showIps(self, ips):
-        for v in self.views:
-            v.showIps(ips)
-    
     def update(self, pymeshAdapter):
         for v in self.views:
             v.update(pymeshAdapter)
