@@ -17,8 +17,6 @@ class PymeshAdapter:
         self.receiveBuffer = ReceiveBuffer()
         self.meshController = MeshController(view, self.getMyAddress(), pycomInterface)
         self.meshControllerLock = pycomInterface.allocate_lock()
-        
-
         self.listenThread = pycomInterface.start_new_thread(PymeshAdapter._listen, (self, socket, pycomInterface))
         self.socketThread = pycomInterface.start_new_thread(PymeshAdapter._sendThread, (self, socket, pycomInterface))
 

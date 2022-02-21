@@ -12,7 +12,7 @@ from view.SerialConsoleView import SerialConsoleView
 
         
 
-class AppController:
+class MeshTestConsole:
     def __init__(self):
 
         self.view = CompositeView()
@@ -29,3 +29,12 @@ class AppController:
         while True:
             this.view.update(this.pm)
             time.sleep(1)
+    
+    def p():
+        global a
+        a.pm.sendMessage(52, b"Ping")
+
+    def rp():
+        global a
+        m = Message(54, Route(bytes((54,102, 101))), Message.TYPE_MESSAGE, b"Routethis")
+        a.pm.meshController.addToQue(m)
