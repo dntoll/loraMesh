@@ -27,8 +27,16 @@ Non-functional requirements
 
 ## Usage
 
+### Update using Visual Studio Code and pymakr plugin
+To update a single Node connected to the computer through USB we use the pymakr plugin by pycom.
+https://pycom.io/products/supported-networks/pymakr/
+
+Depending on the "Global settings" ("auto_connect": true) and pymakr.conf ("address": "COM7",) you get access to the Node through REPL. 
+
+Right now a secrets.py is needed to run the code in main.py, see below
 
 ### OTA update
+To update more than one node, the current strategy for OTA is to run the 
 
 
 
@@ -41,9 +49,15 @@ pwa = 'wifipassword' #wifi-passord used OTA using the release_push.py
 # telnet and ftp-credentials
 userName = 'micro'
 passwd = 'python'
-# list of clients to update using OTA
+# list of clients to update using OTA this one is used in the release_push.py
 clients = ["192.168.1.138", "192.168.1.253", "192.168.1.48", "192.168.1.15"]
 ```
+
+When all nodes have secrets.py and you have a list of wifi-ip-adresses of all nodes then you can run:
+```bash
+python release_push.py
+```
+
 
 ## Evaluation
 
