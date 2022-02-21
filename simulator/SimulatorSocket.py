@@ -12,8 +12,15 @@ class SimulatorSocket:
 		self.lock = threading.Lock()
 		self.posx = posx
 		self.posy = posy
+		self.isDisabled = False
+	
+	def disableRadio(self):
+		self.isDisabled = True
         
 	def send(self, bytes):
+		if self.isDisabled:
+			return
+
 		self.lock.acquire()
 		for i in bytes:
 			self.sendBuffer.append(i)
@@ -22,10 +29,15 @@ class SimulatorSocket:
 		return
         
 	def receive(self):
+		
+
 		self.lock.acquire()
 		rec = bytes(self.receiveBuffer)
 		self.receiveBuffer = bytearray(b"")
 		self.lock.release()
+
+		if self.isDisabled:
+			return (b"", 0)
 
 		Stats = namedtuple("Stats", "rssi")
 		return (rec, Stats(-50))

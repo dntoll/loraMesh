@@ -61,7 +61,6 @@ class SendQue:
             if queItem.tryAcc(message):
                 didAcc = True
         return didAcc
-
     
     def getMessageToSend(self):
         now = self.pycomInterface.ticks_ms()

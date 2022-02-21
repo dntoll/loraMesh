@@ -6,6 +6,7 @@ from view.CompositeView import CompositeView
 
 from simulator.SimulatorSocket import SimulatorSocket
 from mesh.PymeshAdapter import PymeshAdapter
+from mesh.Message import Message
 from time import sleep
 
 class SimTest:
@@ -20,10 +21,17 @@ class SimTest:
 
     def add(self, nodeId, x, y):
         socket = SimulatorSocket(nodeId, x, y)
-        self.radio.add(socket)
+        self.radio.add(nodeId, socket)
         self.views[nodeId] = SimTestView(nodeId)
         
         self.clients[nodeId] = PymeshAdapter(self.views[nodeId], socket, self.fpi)
+
+    def disableRadio(self, nodeId):
+        self.radio.disableRadio(nodeId)
+    
+    def clearMessages(self, nodeId):
+        self.views[nodeId].clearMessages()
+
 
     def send(self, fromNodeID, to, message):
         self.clients[fromNodeID].sendMessage(to, message)
@@ -39,8 +47,23 @@ class SimTest:
             sleep(timePerStep)
 
     def assertHasMessage(self, nodeID, messageType):
-        assert self.views[nodeID].hasMessage(messageType), "No message on node " + str(nodeID) + " of type " + str(messageType)
+        if messageType == Message.TYPE_ACC:
+            t = "acc"
+        elif messageType == Message.TYPE_FIND:
+            t = "find"
+        else:
+            t = "message"
+        hasMess = self.views[nodeID].hasMessage(messageType)
+        assert hasMess, "No message on node " + str(nodeID) + " of type " + t
     
     def assertHasNoMessage(self, nodeID, messageType):
-        assert not self.views[nodeID].hasMessage(messageType), "No message on node " + str(nodeID) + " of type " + str(messageType)
+        if messageType == Message.TYPE_ACC:
+            t = "acc"
+        elif messageType == Message.TYPE_FIND:
+            t = "find"
+        else:
+            t = "message"
+
+        hasMess = self.views[nodeID].hasMessage(messageType)
+        assert not hasMess, "No message on node " + str(nodeID) + " of type " + t
         

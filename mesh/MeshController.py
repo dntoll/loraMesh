@@ -11,9 +11,7 @@ class MeshController:
         self.sendQue = SendQue(pycomInterface)
         self.router = Router(pycomInterface, myMac)
         self.myMac = myMac
-        
         self.view = view
-        
 
     def onReceive(self, message, loraStats):
         

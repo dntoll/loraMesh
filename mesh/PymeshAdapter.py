@@ -20,6 +20,7 @@ class PymeshAdapter:
         self.listenThread = pycomInterface.start_new_thread(PymeshAdapter._listen, (self, socket, pycomInterface))
         self.socketThread = pycomInterface.start_new_thread(PymeshAdapter._sendThread, (self, socket, pycomInterface))
 
+    
     def getMessagesInSendQue(self):
         self.meshControllerLock.acquire(1)
         m = self.meshController.getSendQue().getSendQue()

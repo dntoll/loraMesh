@@ -54,6 +54,8 @@ class SimTestView:
                 return True
         return False
 
+    def clearMessages(self):
+        self.buffer = []
 
 
     def _printMessage(self, title, message):
