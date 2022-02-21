@@ -28,6 +28,15 @@ This project is free to use according to MIT Licence.
 
 ## Usage
 
+### Projects
+Right now there are a couple of different projects in the same folder, that are not well divided
+ * Mesh-library
+
+We would like a bash interface of shellscripts to run the common tasks
+ * clean.sh - remove python cache files
+ * test.sh - run tests
+
+
 ### Install
 We recommend Visual Studio Code 
 
@@ -74,8 +83,8 @@ python release_push.py
 # Evaluation
 
 Evaluation of the project consist of:
- * MeshTestConsole.py - Set up a physical mesh network on actual LoPy4 nodes on the same WiFI network
- * Automated unit-tests - Classes can have these, right now these should be added or moved into a test folder and run via pytest instead of on actual devices
+ * MeshTestConsole.py - Set up a physical mesh network on actual LoPy4 nodes on the same WiFI network. This should both 
+ * Automated unit-tests - Classes can have these, right now these should be added or moved into a test folder and run on PC via pytest instead of on actual devices
  * Automated simulated mesh-network tests -  these are written as unit test and run via pytest
  * Large-simulations of mesh-network with performance metrics as well as visualisations
 
