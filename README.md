@@ -27,6 +27,12 @@ Non-functional requirements
 
 ## Usage
 
+
+### OTA update
+
+
+
+Add a secrets.py file with credentials for OTA-updates
 secrets.py
 ```python
 # wifi-credentials
