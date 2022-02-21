@@ -76,7 +76,7 @@ def test_sendBeteweenFourNodes():
     st.add(4, 3, 0)
 
     st.send(1, 4, b"h")
-    st.wait(8)
+    st.wait(10)
     st.assertHasMessage(4, Message.TYPE_FIND)
     st.assertHasMessage(1, Message.TYPE_ACC)
     st.endSim()

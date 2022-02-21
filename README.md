@@ -58,6 +58,7 @@ To update more than one node, the current strategy for OTA is to update nodes th
 
 The current release_push.py does have the following problems
  * Very insecure!!! FTP with open password! Also each node has WiFi credentials and knows all IPs of all other nodes
+ * TODO: use key-storage
  * Does not remove files, only overwrites old files and uploads new files
  * May upload files not intended...
 

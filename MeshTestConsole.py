@@ -23,7 +23,7 @@ class MeshTestConsole:
 
     def run(self):
         #Want to run the loop in a separate thread to make sure we can interract with the app on this one
-        _thread.start_new_thread(AppController.mainLoopInThread, (self, self))
+        _thread.start_new_thread(MeshTestConsole.mainLoopInThread, (self, self))
 
     def mainLoopInThread(this, that):
         while True:

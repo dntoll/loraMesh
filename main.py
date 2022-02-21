@@ -26,12 +26,14 @@ wlan = network.WLAN(mode=network.WLAN.STA)
 
 print(wlan.ifconfig())
 
-print("Release 1")
+
 
 Message.test()
 
 a = MeshTestConsole()
 a.run()
+
+print("Release 2")
 
 
 
