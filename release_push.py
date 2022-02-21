@@ -40,7 +40,7 @@ class FTPPusher:
     def _pushAllPyFiles(ftp, dirpath, filenames):
         for fileName in filenames:
             if ".py" in fileName:
-                disallowedFiles = ["test_", "release_"]
+                disallowedFiles = ["test_", "release_", "sim_"]
                 doIncludeFile = True
                 for notAllowed in disallowedFiles:
                     if notAllowed in fileName:
