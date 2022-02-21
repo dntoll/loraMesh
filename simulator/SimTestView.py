@@ -68,7 +68,7 @@ class SimTestView:
             t = "mes"
         
         
-        print(self.nodeName + title + "(" + str(s) + ")" + self._routeToStr(r) + " " + str(t), flush=True)
+        print(self.nodeName + title + "(" + str(s) + ")" + self._routeToStr(r) + " " + str(t))
 
     #TODO: copy paste
     def _routeToStr(self, route):

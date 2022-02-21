@@ -1,4 +1,3 @@
-
 # Project description and vision
 
 Lora Mesh is a application layer lora mesh library that enables pycom LoPy4 units to send messages that gets routed.
@@ -16,6 +15,7 @@ Functional requirements
  * Sender receive ACC-Message when Receiver has received the Message
  * Nodes re-send Message up until timeout
  * Sender gets notified if Receiver cannot be found within timeout
+ * When nodes disappear, the mesh re-routes (NOT IMPLEMENTED)
 
 Non-functional requirements
  * Reduce resources (power, lora usage, CPU etc)
@@ -24,9 +24,18 @@ Non-functional requirements
  * Relies on automated testing techniques
 
 ### Contribution
+This project is free to use according to MIT Licence.
 
 ## Usage
 
+### Install
+We recommend Visual Studio Code 
+
+To run scripts as well as test the app
+```bash 
+sudo apt-get install python3
+pip install -U pytest
+``` 
 ### Update using Visual Studio Code and pymakr plugin
 To update a single Node connected to the computer through USB we use the pymakr plugin by pycom.
 https://pycom.io/products/supported-networks/pymakr/
@@ -36,9 +45,12 @@ Depending on the "Global settings" ("auto_connect": true) and pymakr.conf ("addr
 Right now a secrets.py is needed to run the code in main.py, see below
 
 ### OTA update
-To update more than one node, the current strategy for OTA is to run the 
+To update more than one node, the current strategy for OTA is to update nodes through FTP and then reset them through Telnet.
 
-
+The current release_push.py does have the following problems
+ * Very insecure!!! FTP with open password! Also each node has WiFi credentials and knows all IPs of all other nodes
+ * Does not remove files, only overwrites old files and uploads new files
+ * May upload files not intended...
 
 Add a secrets.py file with credentials for OTA-updates
 secrets.py
@@ -59,9 +71,19 @@ python release_push.py
 ```
 
 
-## Evaluation
+# Evaluation
+
+Evaluation of the project consist of:
+ * MeshTestConsole.py - Set up a physical mesh network on actual LoPy4 nodes on the same WiFI network
+ * Automated unit-tests - Classes can have these, right now these should be added or moved into a test folder and run via pytest instead of on actual devices
+ * Automated simulated mesh-network tests -  these are written as unit test and run via pytest
+ * Large-simulations of mesh-network with performance metrics as well as visualisations
 
 ### Test strategy
+
+```bash
+python3 -m pytest
+```
 
 ### Simulations
 
@@ -69,6 +91,7 @@ python release_push.py
 
 
 # TODO
+ * Explore new more secure versions of OTA-update
  * Receive Que -> hålla reda på mottagna meddelanden
  * Routes - Favor best route
  * Route message

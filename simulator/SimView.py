@@ -51,8 +51,8 @@ class SimView:
         else:
             t = "mes"
         
-        
-        print(self.nodeName + title + "(" + str(s) + ")" + self._routeToStr(r) + " " + str(t), flush=True)
+        toPrint = self.nodeName + title + "(" + str(s) + ")" + self._routeToStr(r) + " " + str(t)
+        print(toPrint)
 
     
     def _routeToStr(self, route):
