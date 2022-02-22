@@ -1,3 +1,5 @@
+from time import sleep
+
 class Radio:
     def __init__(self):
         self.nodes = {}
@@ -10,7 +12,22 @@ class Radio:
     def disableRadio(self, nodeId):
         self.nodes[nodeId].disableRadio()
 
+
+    def processUntilSilent(self, secondsOfSilence):
+        sleepTime = 0.1
+
+        timeSilent = 0
+        while timeSilent < secondsOfSilence:
+            sleep(sleepTime)
+            timeSilent += sleepTime
+            if self.process():
+                timeSilent = 0.0
+
+
+
     def process(self):
+
+        handledMessage = False
         for ix in self.nodes:
             ss = self.nodes[ix]
             #check outgoing
@@ -18,6 +35,9 @@ class Radio:
                 self.sends += 1
                 self.sendToAllButMe(ss, ss.sendBuffer)
                 ss.clearSendBuffer()
+                handledMessage = True
+        
+        return handledMessage
     
     def sendToAllButMe(self, sender, buffer):
         bytesArray = bytes(buffer)

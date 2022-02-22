@@ -54,6 +54,12 @@ class SimTestView:
                 return True
         return False
 
+    def hasMessageFrom(self, sender, messageType):
+        for message in self.buffer:
+            if message.messageType == messageType and message.getRoute().getOrigin() == sender:
+                return True
+        return False
+
     def clearMessages(self):
         self.buffer = []
 

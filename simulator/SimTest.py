@@ -39,12 +39,8 @@ class SimTest:
     def endSim(self):
         self.fpi.die()
 
-    def wait(self, steps):
-        timePerStep = 0.1
-
-        for i in range(steps):
-            self.radio.process()
-            sleep(timePerStep)
+    def processUntilSilent(self, secondsOfSilence):
+        self.radio.processUntilSilent(secondsOfSilence)
 
     def assertHasMessage(self, nodeID, messageType):
         if messageType == Message.TYPE_ACC:
