@@ -1,9 +1,8 @@
 import time
 import _thread
 
-from mesh.PymeshAdapter import PymeshAdapter
-from mesh.ThreadSafeLoraSocket import ThreadSafeLoraSocket
-from mesh.PycomInterface import PycomInterface
+from mesh.MeshFacade import MeshFacade
+
 
 from view.CompositeView import CompositeView
 from view.RGBView import RGBView
@@ -16,10 +15,13 @@ class MeshTestConsole:
     def __init__(self):
 
         self.view = CompositeView()
-        self.view.add(RGBView())
+        #self.view.add(RGBView())
         self.view.add(SerialConsoleView())
         
-        self.pm = PymeshAdapter(self.view, ThreadSafeLoraSocket(), PycomInterface())
+        self.mf = MeshFacade(self.view, MeshTestConsole.callback)
+
+    def callback():
+        return
 
     def run(self):
         #Want to run the loop in a separate thread to make sure we can interract with the app on this one
@@ -27,14 +29,12 @@ class MeshTestConsole:
 
     def mainLoopInThread(this, that):
         while True:
-            this.view.update(this.pm)
+            this.view.update(this.mf.pma) #not superhappy about this instead the facade should offer an interface for this
             time.sleep(1)
     
-    def p():
-        global a
-        a.pm.sendMessage(52, b"Ping")
+    def p(self):
+        self.mf.sendMessage(52, b"Ping")
 
-    def rp():
-        global a
+    def rp(self):
         m = Message(54, Route(bytes((54,102, 101))), Message.TYPE_MESSAGE, b"Routethis")
-        a.pm.meshController.addToQue(m)
+        self.mf.meshController.addToQue(m)

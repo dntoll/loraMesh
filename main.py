@@ -33,7 +33,7 @@ Message.test()
 a = MeshTestConsole()
 a.run()
 
-print("Release 2")
+print("Release 3")
 
 
 
