@@ -1,5 +1,7 @@
 import sys
-sys.path.append("C:\\Users\\ttoda\\programming\\pycom\\loraMesh\\MeshTestConsole")
+import os
+cwd = os.getcwd()
+sys.path.append(cwd + "\\MeshTestConsole")
 
 from simulator.SimulatorSocket import SimulatorSocket
 from simulator.FakePycomInterface import FakePycomInterface
