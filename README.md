@@ -28,6 +28,15 @@ This project is free to use according to MIT Licence.
 
 ## Usage
 
+LoPy4-Library can be found in MestTestConsole\meshlibrary
+
+```python
+f = MeshFacade()
+print(f.getMyAddress())
+
+f.sendMessage(target_ip, b"content in bytes")
+```
+
 ### Projects
 Right now there are a couple of different projects in the same folder, that are not well divided
  * Mesh-library
