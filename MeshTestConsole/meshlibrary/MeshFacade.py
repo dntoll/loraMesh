@@ -11,3 +11,6 @@ class MeshFacade:
 
     def sendMessage(self, target_ip, message):
         self.pma.sendMessage(target_ip, message)
+
+    def getKnownNodes(self):
+        return self.pma.getKnownNodes()

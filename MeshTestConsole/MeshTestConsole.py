@@ -32,6 +32,9 @@ class MeshTestConsole:
             this.view.update(this.mf.pma) #not superhappy about this instead the facade should offer an interface for this
             time.sleep(1)
     
+    def n(self):
+        print(self.mf.getKnownNodes)
+
     def p(self):
         self.mf.sendMessage(52, b"Ping")
 

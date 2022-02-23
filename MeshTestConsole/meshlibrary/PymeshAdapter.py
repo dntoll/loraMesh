@@ -27,6 +27,12 @@ class PymeshAdapter:
         self.meshControllerLock.release()
         return m
 
+    def getKnownNodes(self):
+        self.meshControllerLock.acquire(1)
+        m = self.meshController.router.getKnownNodes()
+        self.meshControllerLock.release()
+        return m
+
     def getNeighbors(self):
         self.meshControllerLock.acquire(1)
         m = self.meshController.router.getNeighbors()
