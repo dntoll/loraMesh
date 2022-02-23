@@ -1,5 +1,5 @@
-from mesh.Route import Route
-from mesh.MessageChecksum import MessageChecksum
+from meshlibrary.Route import Route
+from meshlibrary.MessageChecksum import MessageChecksum
 
 class ToShortMessageException(Exception):
     def __init__(self, text):

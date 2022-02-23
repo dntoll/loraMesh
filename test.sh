@@ -1,1 +1,3 @@
-python -m pytest
+#!/bin/bash
+
+python3 -m pytest

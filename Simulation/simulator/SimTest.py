@@ -1,12 +1,11 @@
 from simulator.FakePycomInterface import FakePycomInterface
 from simulator.Radio import Radio
 from simulator.SimTestView import SimTestView
-from simulator.SimView import SimView
 from view.CompositeView import CompositeView
 
 from simulator.SimulatorSocket import SimulatorSocket
-from mesh.PymeshAdapter import PymeshAdapter
-from mesh.Message import Message
+from meshlibrary.PymeshAdapter import PymeshAdapter
+from meshlibrary.Message import Message
 from time import sleep
 
 class SimTest:

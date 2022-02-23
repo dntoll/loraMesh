@@ -1,7 +1,7 @@
 
-from mesh.Message import ToShortMessageException
-from mesh.Message import NotAMessageException
-from mesh.Message import Message
+from meshlibrary.Message import ToShortMessageException
+from meshlibrary.Message import NotAMessageException
+from meshlibrary.Message import Message
 
 class ReceiveBuffer:
     BUFFER_SIZE = 256

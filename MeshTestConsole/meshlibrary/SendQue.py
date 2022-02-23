@@ -1,5 +1,5 @@
 
-from mesh.MessageChecksum import MessageChecksum
+from meshlibrary.MessageChecksum import MessageChecksum
 
 class QueItem:
 

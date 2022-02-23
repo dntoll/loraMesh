@@ -1,9 +1,15 @@
-from mesh.PymeshAdapter import PymeshAdapter
+import sys
+sys.path.append("C:\\Users\\ttoda\\programming\\pycom\\loraMesh\\MeshTestConsole")
+
+
+
+
+from meshlibrary.PymeshAdapter import PymeshAdapter
 from simulator.SimulatorSocket import SimulatorSocket
 from simulator.FakePycomInterface import FakePycomInterface
 from simulator.Radio import Radio
 from simulator.SimTestView import SimTestView
-from mesh.Message import Message
+from meshlibrary.Message import Message
 
 
 

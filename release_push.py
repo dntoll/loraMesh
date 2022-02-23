@@ -1,6 +1,6 @@
 from ftplib import FTP
 from os import walk
-import secrets
+from MeshTestConsole import secrets
 import threading
 import telnetlib
 
@@ -25,7 +25,7 @@ class Telnet:
                 tn.close()
                 print("telnet closed", flush=True)
         except:
-            print("Something went wrong telnetting to " +clientIP )
+            print("Something went wrong telnet ing to " +clientIP )
 
 
 class FTPPusher:
@@ -54,19 +54,19 @@ class FTPPusher:
 
     def push(this, that):
         try:
-            FTPPusher.pushFolders(this)
+            #FTPPusher.pushFolders(this)
             a = Telnet(this.clientID,this.username, this.password, b"machine.reset()")
         except:
             print("FTP Exception on client " + this.clientID)
     
     def pushFolders(this):
         with FTP(this.clientID, timeout=10) as ftp:
-            mypath = "."
+            mypath = "./MeshTestConsole"
             ftp.login(user=this.username, passwd=this.password)
             ftp.cwd('flash')
 
             for (dirpath, dirnames, filenames) in walk(mypath):
-                disallowedFolders = [".\.git", "__pycache__", "simulator", ".pytest_cache"]
+                disallowedFolders = [".\.git", "__pycache__", ".pytest_cache"]
 
                 doIncludeFolder = True
                 for notAllowed in disallowedFolders:

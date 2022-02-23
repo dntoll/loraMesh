@@ -1,7 +1,7 @@
 import time
 import _thread
 
-from mesh.MeshFacade import MeshFacade
+from meshlibrary.MeshFacade import MeshFacade
 
 
 from view.CompositeView import CompositeView

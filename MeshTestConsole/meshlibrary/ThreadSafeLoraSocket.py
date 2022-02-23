@@ -3,7 +3,7 @@ import _thread
 import socket
 import ubinascii, network
 from network import LoRa
-from mesh.ReceiveBuffer import ReceiveBuffer
+from meshlibrary.ReceiveBuffer import ReceiveBuffer
 
 class ThreadSafeLoraSocket:
     def __init__(self):

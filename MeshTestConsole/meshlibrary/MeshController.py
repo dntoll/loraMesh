@@ -1,8 +1,8 @@
-from mesh.Message import Message
-from mesh.Router import Router
-from mesh.Route import Route
-from mesh.SendQue import SendQue
-from mesh.MessageChecksum import MessageChecksum
+from meshlibrary.Message import Message
+from meshlibrary.Router import Router
+from meshlibrary.Route import Route
+from meshlibrary.SendQue import SendQue
+from meshlibrary.MessageChecksum import MessageChecksum
 
 #this class implements the mesh network protocol
 class MeshController:

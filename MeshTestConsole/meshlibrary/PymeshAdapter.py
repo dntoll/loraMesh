@@ -1,11 +1,11 @@
 import time
 import sys
 import struct
-from mesh.Message import Message
+from meshlibrary.Message import Message
 
-from mesh.MeshController import MeshController
-from mesh.ReceiveBuffer import ReceiveBuffer
-from mesh.Route import Route
+from meshlibrary.MeshController import MeshController
+from meshlibrary.ReceiveBuffer import ReceiveBuffer
+from meshlibrary.Route import Route
 
 class PymeshAdapter:
     
