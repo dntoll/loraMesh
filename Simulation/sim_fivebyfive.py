@@ -13,8 +13,6 @@ from simulator.Radio import Radio
 from simulator.SimTestView import SimTestView
 from meshlibrary.Message import Message
 
-
-
 radio = Radio()
 fpi = FakePycomInterface()
 
@@ -38,6 +36,7 @@ radio.processUntilSilent(secondsOfSilence = 2)
 
 print("Here we should get 24 ACC messages: in " +str(radio.sends) + " sends." )
 for i in range(25):
+
     if views[i].hasMessageFrom(24-i, Message.TYPE_ACC):
         print(str(i) + " got Acc from " + str(24-i))
         

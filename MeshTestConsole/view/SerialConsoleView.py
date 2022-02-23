@@ -1,8 +1,8 @@
 #from tabnanny import check
 from lib.Console import Console
 from lib.ANSIEscape import ANSIEscape
-from mesh.Message import Message
-from mesh.MessageChecksum import MessageChecksum
+from meshlibrary.Message import Message
+from meshlibrary.MessageChecksum import MessageChecksum
 
 
 class SerialConsoleView:
