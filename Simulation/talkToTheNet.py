@@ -13,12 +13,14 @@ from simulator.Radio import Radio
 from simulator.SimTestView import SimTestView
 from meshlibrary.Message import Message
 from view.SerialConsoleView import SerialConsoleView
+from MeshTestConsole import MeshTestConsole
+from time import sleep
 
 radio = Radio()
 fpi = FakePycomInterface()
 
 y = 0
-clients = []
+clients = {}
 views = {}
 for i in range(25):
     views[i] = SimTestView(i)
@@ -28,6 +30,12 @@ for i in range(25):
     y = i/5
     socket = SimulatorSocket(i, x, y)
     radio.add(i, socket)
-    clients.append(PymeshAdapter(views[i], socket, fpi))
+    clients[i] = PymeshAdapter(views[i], socket, fpi)
 
-c = MeshTestConsole()
+c = MeshTestConsole(views[i], FakePycomInterface(), clients[i])
+
+c.run()
+
+while True:
+    radio.process()
+    sleep(0.1)

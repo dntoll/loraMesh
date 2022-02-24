@@ -13,7 +13,7 @@ class Telnet:
 
         try:
             with telnetlib.Telnet(HOST, 23) as tn:
-                print("telnet reset...", flush=True)
+                print("telnet >>>" + str(command), flush=True)
                 tn.read_until(b"Login as: ")
                 tn.write(user.encode('ascii') + b"\r\n")
                 if password:
@@ -22,9 +22,11 @@ class Telnet:
 
                 tn.read_until(b">>>", timeout=1)
                 tn.write(command + b"\r\n")
+                tn.read_until(b">>>", timeout=1)
                 tn.close()
                 print("telnet closed", flush=True)
-        except:
+        except Exception as e:
+            print(e)
             print("Something went wrong telnet ing to " +clientIP )
 
 
@@ -37,7 +39,8 @@ class FTPPusher:
         t = threading.Thread(target=FTPPusher.push, args=(self, self), daemon=False)
         t.start() 
 
-    def _pushAllPyFiles(ftp, dirpath, filenames):
+    def _pushAllPyFiles(ftp, localSubFolder, filenames):
+        print("_pushAllPyFiles" + localSubFolder)
         for fileName in filenames:
             if ".py" in fileName:
                 disallowedFiles = ["test_", "release_", "sim_"]
@@ -47,49 +50,54 @@ class FTPPusher:
                         doIncludeFile = False
 
                 if doIncludeFile:
-                    completePath = dirpath + "\\" + fileName
+                    completePath = localSubFolder + "\\" + fileName
                     with open(completePath, "rb") as fp:
                         ftp.storbinary("STOR " + fileName, fp)
                     print("Wrote: " + completePath + " to device ", flush=True)
 
     def push(this, that):
         try:
-            #FTPPusher.pushFolders(this)
-            a = Telnet(this.clientID,this.username, this.password, b"machine.reset()")
+            a = Telnet(this.clientID,this.username, this.password, b"import ftpdeploy; ftpdeploy.cleandirectory()")
+            FTPPusher.pushFolders(this)
+            a = Telnet(this.clientID,this.username, this.password, b"import machine; machine.reset()")
         except:
             print("FTP Exception on client " + this.clientID)
     
     def pushFolders(this):
         with FTP(this.clientID, timeout=10) as ftp:
-            mypath = "./MeshTestConsole"
+            localBasePath = ".\\MeshTestConsole"
             ftp.login(user=this.username, passwd=this.password)
             ftp.cwd('flash')
 
-            for (dirpath, dirnames, filenames) in walk(mypath):
-                disallowedFolders = [".\.git", "__pycache__", ".pytest_cache"]
+            for (localSubFolder, dirnames, filenames) in walk(localBasePath):
+                disallowedFolders = [".git", "__pycache__", ".pytest_cache"]
+                
 
                 doIncludeFolder = True
                 for notAllowed in disallowedFolders:
-                    if notAllowed in dirpath:
+                    if notAllowed in localSubFolder:
                         doIncludeFolder = False
 
                 if doIncludeFolder:
-                    print("Dirpath:" + dirpath)
-                    if "." == dirpath:
-                        FTPPusher._pushAllPyFiles(ftp, dirpath, filenames)
-                    elif ".\\" in dirpath: #dont push .git
-                        dirName = dirpath[2:]
+                    print("Local directory path:" + localSubFolder, flush=True)
+                    if localBasePath == localSubFolder:
+                        #these end up in Flash
+                        FTPPusher._pushAllPyFiles(ftp, localSubFolder, filenames)
+                    elif localBasePath + "\\" in localSubFolder: #dont push .git
+                        dirName = localSubFolder[len(localBasePath)+1:]
                         onDeviceDirName = 'flash' + "/" + dirName
-
+                        print("onDeviceDirName " + onDeviceDirName, flush=True)
                         ftp.cwd("..") # step out of flash
                         try:
                             ftp.mkd(onDeviceDirName)
                             print("mkdir " + onDeviceDirName)
                         except:
                             print("dir exists")
-
+                        print("cwd")
                         ftp.cwd(onDeviceDirName)
-                        FTPPusher._pushAllPyFiles(ftp, dirpath, filenames)
+                        print("after" + localSubFolder, flush=True)
+                        FTPPusher._pushAllPyFiles(ftp, localSubFolder, filenames)
+                        print("pushed")
                         ftp.cwd("..") #step out to flash
             ftp.close()
         

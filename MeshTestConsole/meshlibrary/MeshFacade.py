@@ -14,3 +14,13 @@ class MeshFacade:
 
     def getKnownNodes(self):
         return self.pma.getKnownNodes()
+
+    def getMessagesInSendQue(self):
+        return self.pma.getMessagesInSendQue()
+
+
+    def getNeighbors(self):
+        return self.pma.getNeighbors()
+    
+    def getRoutes(self):
+        return self.pma.getRoutes()

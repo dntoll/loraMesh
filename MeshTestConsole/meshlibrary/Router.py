@@ -49,7 +49,7 @@ class Router:
     def getKnownNodes(self):
         ret = {}
         for n in self.neighbors:
-            ret[n.mac] = n.mac
+            ret[self.neighbors[n].mac] = self.neighbors[n].mac
 
         for route in self.routes:
             parts = self.routes[route].getBytes()

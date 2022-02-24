@@ -1,36 +1,28 @@
 import time
 import _thread
 
-from meshlibrary.MeshFacade import MeshFacade
-
-
-from view.CompositeView import CompositeView
-from view.RGBView import RGBView
-from view.SerialConsoleView import SerialConsoleView
-
-
-        
+       
 
 class MeshTestConsole:
-    def __init__(self):
+    def __init__(self, view, hardwareInterface, mf):
 
-        self.view = CompositeView()
-        #self.view.add(RGBView())
-        self.view.add(SerialConsoleView())
+        self.view = view
+        self.hardwareInterface = hardwareInterface
         
-        self.mf = MeshFacade(self.view, MeshTestConsole.callback)
+        
+        self.mf = mf
 
     def callback():
         return
 
     def run(self):
         #Want to run the loop in a separate thread to make sure we can interract with the app on this one
-        _thread.start_new_thread(MeshTestConsole.mainLoopInThread, (self, self))
+        self.hardwareInterface.start_new_thread(MeshTestConsole.mainLoopInThread, (self, self))
 
     def mainLoopInThread(this, that):
         while True:
-            this.view.update(this.mf.pma) #not superhappy about this instead the facade should offer an interface for this
-            time.sleep(1)
+            this.view.update(this.mf) #not superhappy about this instead the facade should offer an interface for this
+            this.hardwareInterface.sleep_ms(1000)
     
     def n(self):
         print(self.mf.getKnownNodes)

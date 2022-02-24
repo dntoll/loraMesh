@@ -17,3 +17,19 @@ wlan = network.WLAN(mode=network.WLAN.STA)
 #end of OTA
 
 print(wlan.ifconfig())
+
+
+def cleandirectory():
+
+    import os
+    for fileOrDir in os.listdir():
+        try:
+            os.remove(fileOrDir)
+        except:
+            directory = fileOrDir
+            oldDir = os.getcwd()
+            os.chdir(directory)
+            cleandirectory()
+            os.chdir(oldDir)
+            os.rmdir(directory)
+            
