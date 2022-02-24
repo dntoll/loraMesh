@@ -25,7 +25,7 @@ class Console:
             self.buffer += val.get(self.height)
         script = ANSIEscape.saveState()
         script += self.buffer
-        print(script + ANSIEscape.loadState(), end='')
+        print(script + ANSIEscape.loadState(), end='', flush=True)
         self.clear()
 
     def frame(self, x, y, width, height):

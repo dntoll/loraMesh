@@ -82,7 +82,6 @@ class SerialConsoleView:
 
 
     def update(self, pymeshAdapter):
-        
         consolePosition = 75
         self.console.frame(consolePosition,0, 55, 6)
         self.console.printAt("mac : " + str(pymeshAdapter.getMyAddress()), consolePosition+2, 0)
@@ -128,4 +127,6 @@ class SerialConsoleView:
         
         
         self.console.show()
+
+        
         return

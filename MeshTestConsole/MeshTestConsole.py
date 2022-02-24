@@ -23,6 +23,7 @@ class MeshTestConsole:
         while True:
             this.view.update(this.mf) #not superhappy about this instead the facade should offer an interface for this
             this.hardwareInterface.sleep_ms(1000)
+            
     
     def n(self):
         print(self.mf.getKnownNodes)

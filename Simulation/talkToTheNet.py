@@ -2,7 +2,7 @@ import sys
 import os
 cwd = os.getcwd()
 sys.path.append(cwd + "\\MeshTestConsole")
-
+import threading
 
 
 
@@ -32,10 +32,28 @@ for i in range(25):
     radio.add(i, socket)
     clients[i] = PymeshAdapter(views[i], socket, fpi)
 
-c = MeshTestConsole(views[i], FakePycomInterface(), clients[i])
 
+
+c = MeshTestConsole(views[0], FakePycomInterface(), clients[0])
 c.run()
 
+
+
+
+def radioThreadFunc(radio, c):
+    while True:
+        radio.process()
+        sleep(0.5)
+
+t = threading.Thread(target=radioThreadFunc, args=(radio, c), daemon=True)
+t.start() 
+
+
 while True:
-    radio.process()
     sleep(0.1)
+    ch = input("Input command master:")
+    print("poo", flush=True)
+    if ch:
+        if ch == "1":
+            for i in range(25):
+                clients[i].sendMessage(24-i, b"first")
