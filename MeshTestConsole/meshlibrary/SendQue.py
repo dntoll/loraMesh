@@ -4,6 +4,7 @@ from meshlibrary.MessageChecksum import MessageChecksum
 class QueItem:
 
     WAIT_UNTIL_RESEND_MS = 10000
+    WAIT_UNTIL_REMOVE_ACCED = 6000
     MAX_SEND_TIMES = 10
 
     def __init__(self, message, sendEarliestAt):
@@ -21,9 +22,16 @@ class QueItem:
             #delay find-messages
             if (self.sentCount == 0 and self.sendEarliestAt < now ) or (self.sentCount > 0 and now - self.sentTime > jumps * self.WAIT_UNTIL_RESEND_MS):
                 return True
-
-            
         return False
+    
+    def shouldBeRemoved(self, now):
+        if self.acced == False:
+            return False
+        
+        if now - self.sentTime > self.WAIT_UNTIL_REMOVE_ACCED:
+            return True
+        return False
+
     
     def doSend(self, now):
         self.sentCount += 1
@@ -61,6 +69,13 @@ class SendQue:
             if queItem.tryAcc(message):
                 didAcc = True
         return didAcc
+
+    def removeOld(self):
+        now = self.pycomInterface.ticks_ms()
+        for queItem in self.sendQue:
+            if queItem.shouldBeRemoved(now):
+                self.sendQue.remove(queItem)
+
     
     def getMessageToSend(self):
         now = self.pycomInterface.ticks_ms()
@@ -83,8 +98,6 @@ class SendQue:
         messageChecksum = MessageChecksum.fromMessage(message)
         for queItem in self.sendQue:
             #things that are acced are no longer in que and can be re-sent
-            #if queItem.acced:
-            #    continue
             if MessageChecksum.fromMessage(queItem.message).isSame(messageChecksum):
                 return True
 

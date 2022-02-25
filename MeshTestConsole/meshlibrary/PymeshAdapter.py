@@ -50,6 +50,7 @@ class PymeshAdapter:
         while (True):
             this.meshControllerLock.acquire(1)
             m = this.meshController.getSendQue().getMessageToSend()
+            this.meshController.getSendQue().removeOld()
             this.meshControllerLock.release()
 
             if m is not None:

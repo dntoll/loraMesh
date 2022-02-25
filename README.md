@@ -28,15 +28,6 @@ This project is free to use according to MIT Licence.
 
 ## Usage
 
-LoPy4-Library can be found in MestTestConsole\meshlibrary
-
-```python
-f = MeshFacade()
-print(f.getMyAddress())
-
-f.sendMessage(target_ip, b"content in bytes")
-```
-
 ### Projects
 Right now there are a couple of different projects in the same folder, that are not well divided
  * Mesh-library
@@ -98,6 +89,9 @@ Evaluation of the project consist of:
  * Automated simulated mesh-network tests -  these are written as unit test and run via pytest
  * Large-simulations of mesh-network with performance metrics as well as visualisations
 
+
+Build Process
+
 ### Test strategy
 
 ```bash
@@ -117,3 +111,4 @@ python3 -m pytest
  * Console View
    * Sent Messages and their que + acc status
  * Plotting https://networkx.org/documentation/stable/reference/drawing.html?highlight=visualize
+ * CI/CD 

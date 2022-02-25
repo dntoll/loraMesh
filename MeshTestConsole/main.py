@@ -4,20 +4,20 @@ import pycom
 pycom.pybytes_on_boot(False)
 pycom.heartbeat(False)
 
-from MeshTestConsole import MeshTestConsole
 from meshlibrary.MeshFacade import MeshFacade
-from meshlibrary.PycomInterface import PycomInterface
-
+from MeshTestConsole import MeshTestConsole
 from view.CompositeView import CompositeView
 from view.SerialConsoleView import SerialConsoleView
+from meshlibrary.PycomInterface import PycomInterface
 
 
 view = CompositeView()
-#self.view.add(RGBView())
+#view.add(RGBView())
 view.add(SerialConsoleView())
-mf = MeshFacade(view, MeshTestConsole.callback)
-        
-a = MeshTestConsole(mf, view, PycomInterface())
+
+a = MeshTestConsole(view= view, hardwareInterface = PycomInterface(), mf = MeshFacade(view, MeshTestConsole.callback))
 a.run()
 
 print("Release 3")
+
+

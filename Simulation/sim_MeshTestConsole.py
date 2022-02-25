@@ -1,8 +1,9 @@
+from msilib.schema import Component
 import sys
 import os
 cwd = os.getcwd()
 sys.path.append(cwd + "\\MeshTestConsole")
-
+import threading
 
 
 
@@ -15,6 +16,7 @@ from simulator.FakePycomInterface import FakePycomInterface
 
 from meshlibrary.Message import Message
 from view.SerialConsoleView import SerialConsoleView
+from view.CompositeView import CompositeView
 from MeshTestConsole import MeshTestConsole
 from time import sleep
 
@@ -25,19 +27,37 @@ y = 0
 clients = {}
 views = {}
 for i in range(25):
-    views[i] = SimTestView(i)
+    views[i] = CompositeView()
     if i == 0:
         views[i] = SerialConsoleView()
     x = i/5
-    y = i/5
+    y = i%5
     socket = SimulatorSocket(i, x, y)
     radio.add(i, socket)
     clients[i] = PymeshAdapter(views[i], socket, fpi)
 
-print("hello")       
-a = MeshTestConsole(clients[i], views[i], FakePycomInterface())
-a.run()
+
+
+c = MeshTestConsole(views[0], FakePycomInterface(), clients[0])
+c.run()
+
+def radioThreadFunc(radio, c):
+    while True:
+        radio.process()
+        sleep(0.5)
+        print(end="", flush=True)
+
+t = threading.Thread(target=radioThreadFunc, args=(radio, c), daemon=True)
+t.start() 
+
 
 while True:
-    radio.process()
     sleep(0.1)
+    ch = input("Input command master:")
+    if ch:
+        if ch == "1":
+            clients[0].sendMessage(1, b"first")
+        elif ch == "2":
+            clients[0].sendMessage(24, b"first")
+        elif ch == "3":
+            break

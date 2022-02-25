@@ -11,7 +11,9 @@ from simulator.SimulatorSocket import SimulatorSocket
 from simulator.FakePycomInterface import FakePycomInterface
 from simulator.Radio import Radio
 from simulator.SimTestView import SimTestView
+from view.CompositeView import CompositeView
 from meshlibrary.Message import Message
+import time
 
 radio = Radio()
 fpi = FakePycomInterface()
@@ -19,30 +21,36 @@ fpi = FakePycomInterface()
 y = 0
 clients = []
 views = {}
-for i in range(25):
-    views[i] = SimTestView(i)
-    x = i/5
-    y = i%5
+
+
+chainLength = 10
+for i in range(chainLength):
+    
+    views[i] = CompositeView()
+    if i == 0:
+        views[0] = SimTestView(i)    
+    x = i
+    y = 0
     socket = SimulatorSocket(i, x, y)
     radio.add(i, socket)
     clients.append(PymeshAdapter(views[i], socket, fpi))
 
 
 #All nodes send message to the other side
-for i in range(25):
-    clients[i].sendMessage(24-i, b"first")
+clients[0].sendMessage(chainLength-1, bytes(i))
 
-radio.processUntilSilent(secondsOfSilence = 2)
+print ("test starts")
+pre = time.time()
+radio.processUntilSilent(secondsOfSilence = 0.5)
+post = time.time()
+print ("test finished")
 
-print("Here we should get 24 ACC messages: in " +str(radio.sends) + " sends." )
-for i in range(25):
+if views[0].hasMessageFrom(chainLength-1, Message.TYPE_ACC):
+    print(str(0) + " got Acc from " + str(chainLength-1))
 
-    if views[i].hasMessageFrom(24-i, Message.TYPE_ACC):
-        print(str(i) + " got Acc from " + str(24-i))
-        
+print("We got a response in " +str(post-pre-0.5) + " sends." )
+
+fpi.die()        
 print("ended tests")
 
-fpi.die()
-print("tried to release threads")
 
-print()

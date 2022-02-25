@@ -14,7 +14,7 @@ class Radio:
 
 
     def processUntilSilent(self, secondsOfSilence):
-        sleepTime = 0.1
+        sleepTime = 0.01
 
         timeSilent = 0
         while timeSilent < secondsOfSilence:

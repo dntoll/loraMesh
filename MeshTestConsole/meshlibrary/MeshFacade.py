@@ -20,4 +20,6 @@ class MeshFacade:
 
     def getNeighbors(self):
         return self.pma.getNeighbors()
-        
+    
+    def getRoutes(self):
+        return self.pma.getRoutes()
