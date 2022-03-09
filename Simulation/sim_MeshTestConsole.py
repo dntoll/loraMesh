@@ -53,11 +53,9 @@ t.start()
 
 while True:
     sleep(0.1)
-    ch = input("Input command master:")
+    ch = input("Input command master [#] Send to # node ID, [Q]uit]:")
     if ch:
-        if ch == "1":
-            clients[0].sendMessage(1, b"first")
-        elif ch == "2":
-            clients[0].sendMessage(24, b"first")
-        elif ch == "3":
+        if ch.isnumeric():
+            clients[0].sendMessage(int(ch), b"Message")
+        elif ch == "Q":
             break

@@ -32,9 +32,24 @@ This project is free to use according to MIT Licence.
 Right now there are a couple of different projects in the same folder, that are not well divided
  * Mesh-library
 
+
+### Running the different test suites
+
+```bash
+cd ~/loraMesh
+```
+
 We would like a bash interface of shellscripts to run the common tasks
+ * install.sh - to install this applications dependencies (However not complete, but this is the place to add things)
+ * git.sh - run this to setup git-ssh to be able to upload code to github, however this should not be needed beside for developers. And I have no idea why I need to do it
  * clean.sh - remove python cache files
- * test.sh - run tests
+ * test.sh - run tests, then clean cache files
+ * OTADeploy.sh - copy files Over The Air to devices (on the same wifi), these devices IP-addresses need to be added to secrets.py
+ * simMeshTestConsole.sh - Start up a simulated network with 25 nodes in a square 
+  * Input a number [#] to send a message to that node from node 0, eg 4
+  * Input [Q] to Quit
+
+
 
 
 ### Install
@@ -92,7 +107,7 @@ Evaluation of the project consist of:
 
 Build Process
 
-### Test strategy
+
 
 ```bash
 python3 -m pytest
@@ -112,3 +127,4 @@ python3 -m pytest
    * Sent Messages and their que + acc status
  * Plotting https://networkx.org/documentation/stable/reference/drawing.html?highlight=visualize
  * CI/CD 
+ * Make message tests into pytest tests
