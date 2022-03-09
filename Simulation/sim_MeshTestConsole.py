@@ -37,9 +37,9 @@ for i in range(25):
     if i == 0:
         views[i] = SerialConsoleView()
         nodeCallBack = MeshTestConsole.callback
-    x = i/5
+    x = i//5
     y = i%5
-    socket = SimulatorSocket(i, x, y)
+    socket = SimulatorSocket(i, x, y, 1.1)
     radio.add(i, socket)
     clients[i] = PymeshAdapter(views[i], socket, fpi, nodeCallBack)
 

@@ -52,12 +52,12 @@ def test_alternatePathWhenNodeGetsRemoved():
 
     st.send(1, 3, b"m")
     st.processUntilSilent(0.3)
-    #st.assertHasMessage(1, Message.TYPE_FIND) We might not want to specify how this happens
+    #st.assertHasMessage(1, Message.TYPE_MESSAGE) #We might not want to specify how this happens
     st.assertHasMessage(3, Message.TYPE_FIND)
     st.assertHasMessage(1, Message.TYPE_ACC)
 
     st.endSim()
-
+    
 def test_firstRelayIsReplaced():
     st = SimTest()
     st.add(1, 0, 0)

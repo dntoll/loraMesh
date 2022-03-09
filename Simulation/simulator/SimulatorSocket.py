@@ -5,13 +5,14 @@ from collections import namedtuple
 class SimulatorSocket:
 	
 	
-	def __init__(self, mac, posx, posy):
+	def __init__(self, mac, posx, posy, range):
 		self.mac = mac
 		self.sendBuffer = bytearray(b"")
 		self.receiveBuffer = bytearray(b"")
 		self.lock = threading.Lock()
 		self.posx = posx
 		self.posy = posy
+		self.range = range
 		self.isDisabled = False
 	
 	def disableRadio(self):
@@ -61,7 +62,7 @@ class SimulatorSocket:
 		distx = (self.posx - other.posx)**2
 		disty = (self.posy - other.posy)**2
 
-		return math.sqrt(distx+disty) <= 1.1
+		return math.sqrt(distx+disty) <= self.range
 
 
 

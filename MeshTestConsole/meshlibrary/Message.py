@@ -49,6 +49,11 @@ class Message:
     def isFind(self):
         return self.messageType == Message.TYPE_FIND
 
+    def transformIntoFindDueToSecondSend(self):
+        if self.messageType == Message.TYPE_MESSAGE:
+            self.messageType = Message.TYPE_FIND
+            return
+
     def getRoute(self):
         return self.route
 

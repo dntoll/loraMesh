@@ -49,13 +49,16 @@ class PymeshAdapter:
     def _sendThread(this, lora_sock, pycomInterface):
         while (True):
             this.meshControllerLock.acquire(1)
-            m = this.meshController.getSendQue().getMessageToSend()
+            queItem = this.meshController.getSendQue().getQueItemToSend()
             this.meshController.getSendQue().removeOld()
             this.meshControllerLock.release()
 
-            if m is not None:
-                lora_sock.send(m.getBytes())
-                this.view.sendMessage(m)
+            #transform mes to fin if sendcount is high
+
+
+            if queItem is not None:
+                lora_sock.send(queItem.message.getBytes())
+                this.view.sendMessage(queItem.message)
 
             pycomInterface.sleep_ms(pycomInterface.rng() % 10)
 

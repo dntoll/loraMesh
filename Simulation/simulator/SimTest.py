@@ -21,7 +21,7 @@ class SimTest:
         print(MessageBytes)
 
     def add(self, nodeId, x, y):
-        socket = SimulatorSocket(nodeId, x, y)
+        socket = SimulatorSocket(nodeId, x, y, 1.1)
         self.radio.add(nodeId, socket)
         self.views[nodeId] = SimTestView(nodeId)
         
@@ -42,6 +42,7 @@ class SimTest:
 
     def processUntilSilent(self, secondsOfSilence):
         self.radio.processUntilSilent(secondsOfSilence)
+        print("process until silent")
 
     def assertHasMessage(self, nodeID, messageType):
         if messageType == Message.TYPE_ACC:

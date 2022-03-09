@@ -1,32 +1,64 @@
+import cairo
+import math
 
 
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import networkx as nx
+class PlotView:
+    def __init__(self, x, y, index):
+        self.x = x
+        self.y = y
+        self.messages = []
+        return
 
-seed = 13648  # Seed random number generators for reproducibility
-G = nx.grid_2d_graph(5, 5)
-pos = nx.spring_layout(G, seed=seed)
+    def draw(self, context, views):
+        context.set_line_width(0.04)
+        context.arc(self.x, self.y, 0.1, 0, 2*math.pi)
+        context.stroke()
+        for m in self.messages:
 
-node_sizes = [3 + 10 * i for i in range(len(G))]
-M = G.number_of_edges()
-edge_colors = range(2, M + 2)
-edge_alphas = [(5 + i) / (M + 4) for i in range(M)]
-cmap = plt.cm.plasma
+            context.new_path()
+            context.move_to(self.x, self.y)
+            ox, oy = self._getPos(m, views)
+            context.line_to(ox, oy)
+            context.stroke()
+            print(str(m.messageType) + " : " + str(self.x) + " " + str(self.y) + " to " + str(ox) + " " + str(oy))
+            
+        return
 
-nodes = nx.draw_networkx_nodes(G, pos, node_size=node_sizes, node_color="indigo")
-edges = nx.draw_networkx_edges(
-    G,
-    pos,
-    node_size=node_sizes,
-    arrowstyle="->",
-    arrowsize=10,
-    edge_color=edge_colors,
-    edge_cmap=cmap,
-    width=2,
-)
-# set alpha value for each edge
+    def _getPos(self, message, views):
+        return views[message.senderMac].x, views[message.senderMac].y
 
-ax = plt.gca()
-ax.set_axis_off()
-plt.show()
+    def receiveMessages(self, messages):
+        return
+
+    def receiveMessageToMe(self, message):
+        self.messages.append(message)
+        return
+    
+    def receiveAccToMe(self, message):
+        self.messages.append(message)
+        return
+    
+    def receivedRouteMessage(self, message):
+        #self.messages.append(message)
+        return
+
+    def receivedNoRouteMessage(self, message):
+        #self.messages.append(message)
+        return
+    def receivedFindMessage(self, message):
+        self.messages.append(message)
+        return
+    def sendMessage(self, message):
+        return
+    
+    def update(self, pymeshAdapter):
+        return 
+    
+    def suggestRoute(self, message):
+        return
+    def passOnFindMessage(self, message):
+        return
+    def receiveAccToOther(self, message):
+        return
+
+

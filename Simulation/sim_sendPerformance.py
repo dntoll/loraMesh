@@ -22,6 +22,9 @@ y = 0
 clients = []
 views = {}
 
+def devNullCallback(origin, content):
+    #print("Content: " + content)
+    return
 
 chainLength = 100
 for i in range(chainLength):
@@ -31,9 +34,9 @@ for i in range(chainLength):
         views[0] = SimTestView(i)    
     x = i
     y = 0
-    socket = SimulatorSocket(i, x, y)
+    socket = SimulatorSocket(i, x, y, 1.1)
     radio.add(i, socket)
-    clients.append(PymeshAdapter(views[i], socket, fpi))
+    clients.append(PymeshAdapter(views[i], socket, fpi, devNullCallback))
 
 
 #All nodes send message to the other side

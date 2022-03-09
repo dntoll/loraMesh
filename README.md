@@ -6,8 +6,8 @@ LoPy4 (Sender) <-> Mesh network of LoPy4 <-> LoPy4 (Receiver)
 
 ## Project goals
 
-Node - (Sender, Receiver)
-Message - (Find, Message, ACC)
+* Node - (Sender, Receiver)
+* Message - (Find, Message, ACC)
 
 Functional requirements
  * All Nodes get their own mesh-network Adress
@@ -15,7 +15,7 @@ Functional requirements
  * Sender receive ACC-Message when Receiver has received the Message
  * Nodes re-send Message up until timeout
  * Sender gets notified if Receiver cannot be found within timeout
- * When nodes disappear, the mesh re-routes (NOT IMPLEMENTED)
+ * When nodes disappear, the mesh re-routes (NOT IMPLEMENTED, BUT SOMETIMES WORK ANYWAY :) )
 
 Non-functional requirements
  * Reduce resources (power, lora usage, CPU etc)
@@ -29,8 +29,14 @@ This project is free to use according to MIT Licence.
 ## Usage
 
 ### Projects
-Right now there are a couple of different projects in the same folder, that are not well divided
- * Mesh-library
+The subfolders contains a number of different things.
+ * MeshTestConsole - A on device physical test application that runs on LoPy4 to test the library itself
+ * MeshTestConsole/meshlibrary - This is the library this project is about, 
+ * MeshTestConsole/lib - Contains things used to test the library
+ * MeshTestConsole/view - Contains things used to view output from the library, observe messages etc.
+ * Simulation - Enables running the library in a simulator and a number of test scenarios.
+ * Simulation/simulator - The code needed to run the library in the simulator ( faking hardware, radio etc )
+ * Root folder - Contains a number of .sh files used to run the different tests
 
 
 ### Running the different test suites
@@ -43,8 +49,8 @@ We would like a bash interface of shellscripts to run the common tasks
  * install.sh - to install this applications dependencies (However not complete, but this is the place to add things)
  * git.sh - run this to setup git-ssh to be able to upload code to github, however this should not be needed beside for developers. And I have no idea why I need to do it
  * clean.sh - remove python cache files
- * test.sh - run tests, then clean cache files
  * OTADeploy.sh - copy files Over The Air to devices (on the same wifi), these devices IP-addresses need to be added to secrets.py
+ * test.sh - run tests, then clean cache files
  * simAllToAll.sh - Create a 25 node network and let them send messages to eachother, count number of messages and make sure each node got an acc from its [24-NodeID], I am getting some page-shear artifacts on this, I think due to threading and using print
  * simSendPerformance - Create a long line of 100 nodes and count time from one end to another. ~14 s
  * simMeshTestConsole.sh - Start up a simulated network with 25 nodes in a square 
@@ -129,4 +135,4 @@ python3 -m pytest
    * Sent Messages and their que + acc status
  * Plotting https://networkx.org/documentation/stable/reference/drawing.html?highlight=visualize
  * CI/CD 
- * Make message tests into pytest tests
+
