@@ -7,11 +7,12 @@ from meshlibrary.MessageChecksum import MessageChecksum
 #this class implements the mesh network protocol
 class MeshController:
 
-    def __init__(self, view, myMac, pycomInterface):
+    def __init__(self, view, myMac, pycomInterface, callback):
         self.sendQue = SendQue(pycomInterface)
         self.router = Router(pycomInterface, myMac)
         self.myMac = myMac
         self.view = view
+        self.callback = callback
 
     def onReceive(self, message, loraStats):
         
@@ -29,6 +30,8 @@ class MeshController:
 
     def _reachedFinalTarget(self, message):
         if not message.isAcc() or message.isFind():
+
+            self.callback(message.getRoute().getOrigin(), message.contentBytes)
             self.view.receiveMessageToMe(message)    
 
             route = message.getRoute()

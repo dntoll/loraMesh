@@ -15,7 +15,7 @@ view = CompositeView()
 #view.add(RGBView())
 view.add(SerialConsoleView())
 
-a = MeshTestConsole(view= view, hardwareInterface = PycomInterface(), mf = MeshFacade(view, MeshTestConsole.callback))
+a = MeshTestConsole(view= view, hardwareInterface = PycomInterface(), meshFacade = MeshFacade(view, MeshTestConsole.callback))
 a.run()
 
 print("Release 3")

@@ -17,13 +17,15 @@ class SimTest:
         self.clients = {}
         self.showOutput = showOutput
 
+    def callBack(nodeID, MessageBytes):
+        print(MessageBytes)
 
     def add(self, nodeId, x, y):
         socket = SimulatorSocket(nodeId, x, y)
         self.radio.add(nodeId, socket)
         self.views[nodeId] = SimTestView(nodeId)
         
-        self.clients[nodeId] = PymeshAdapter(self.views[nodeId], socket, self.fpi)
+        self.clients[nodeId] = PymeshAdapter(self.views[nodeId], socket, self.fpi, SimTest.callBack)
 
     def disableRadio(self, nodeId):
         self.radio.disableRadio(nodeId)

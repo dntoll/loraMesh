@@ -11,6 +11,9 @@ from meshlibrary.Message import Message
 from time import sleep
 
 
+def test_MessageTests():
+    Message.test()
+
 def test_testNodeGetsRemoved():
     st = SimTest()
     st.add(1, 0, 0)

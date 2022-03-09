@@ -26,15 +26,22 @@ fpi = FakePycomInterface()
 y = 0
 clients = {}
 views = {}
+
+def devNullCallback(origin, content):
+    #print("Content: " + content)
+    return
+
 for i in range(25):
     views[i] = CompositeView()
+    nodeCallBack = devNullCallback
     if i == 0:
         views[i] = SerialConsoleView()
+        nodeCallBack = MeshTestConsole.callback
     x = i/5
     y = i%5
     socket = SimulatorSocket(i, x, y)
     radio.add(i, socket)
-    clients[i] = PymeshAdapter(views[i], socket, fpi)
+    clients[i] = PymeshAdapter(views[i], socket, fpi, nodeCallBack)
 
 
 
@@ -53,9 +60,15 @@ t.start()
 
 while True:
     sleep(0.1)
-    ch = input("Input command master [#] Send to # node ID, [Q]uit]:")
+    ch = input("Input command master [#] Send from 0 to # node ID, [Q]uit], [S]:")
     if ch:
         if ch.isnumeric():
             clients[0].sendMessage(int(ch), b"Message")
         elif ch == "Q":
             break
+        elif ch == "S":
+            s = input("Input Sender #:")
+            t = input("Input Target #:")
+            m = input("Input Message :")
+            clients[int(s)].sendMessage(int(t), m.encode('utf-8'))
+            

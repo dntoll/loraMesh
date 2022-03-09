@@ -4,12 +4,13 @@ import _thread
        
 
 class MeshTestConsole:
-    def __init__(self, view, hardwareInterface, mf):
+    def __init__(self, view, hardwareInterface, meshFacade):
         self.view = view
         self.hardwareInterface = hardwareInterface
-        self.mf = mf
+        self.meshFacade = meshFacade
 
-    def callback():
+    def callback(originIP, contentBytes):
+        print("Received: " + contentBytes.decode("utf-8") + " from " + str(originIP))
         return
 
     def run(self):
@@ -20,7 +21,7 @@ class MeshTestConsole:
 
     def mainLoopInThread(this, that):
         while True:
-            this.view.update(this.mf) #not superhappy about this instead the facade should offer an interface for this
+            this.view.update(this.meshFacade) #not superhappy about this instead the facade should offer an interface for this
             this.hardwareInterface.sleep_ms(1000)
             
     

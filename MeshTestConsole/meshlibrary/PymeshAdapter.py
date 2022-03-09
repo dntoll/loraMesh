@@ -10,12 +10,12 @@ from meshlibrary.Route import Route
 class PymeshAdapter:
     
 
-    def __init__(self, view, socket, pycomInterface):
+    def __init__(self, view, socket, pycomInterface, callback):
         self.view = view
         self.socket = socket
 
         self.receiveBuffer = ReceiveBuffer()
-        self.meshController = MeshController(view, self.getMyAddress(), pycomInterface)
+        self.meshController = MeshController(view, self.getMyAddress(), pycomInterface, callback)
         self.meshControllerLock = pycomInterface.allocate_lock()
         self.listenThread = pycomInterface.start_new_thread(PymeshAdapter._listen, (self, socket, pycomInterface))
         self.socketThread = pycomInterface.start_new_thread(PymeshAdapter._sendThread, (self, socket, pycomInterface))

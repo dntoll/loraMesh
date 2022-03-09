@@ -75,36 +75,36 @@ class Message:
 
         return bytes(ret)
 
-    def fromBytes(bytes):
-        if len(bytes) < Message.HEADER_SIZE:
+    def fromBytes(ContentBytes):
+        if len(ContentBytes) < Message.HEADER_SIZE:
             raise NotAMessageException("to small to be a message")
 
-        headerBegin = bytes[Message.HEADER_BEGIN]
+        headerBegin = ContentBytes[Message.HEADER_BEGIN]
         if headerBegin != Message.HEADER_BEGIN_CHAR:
             raise NotAMessageException("headers should begin with " + chr(Message.HEADER_BEGIN_CHAR))
         
-        if bytes[Message.HEADER_END] != Message.HEADER_END_CHAR:
-            raise NotAMessageException("headers should end with " + chr(Message.HEADER_END_CHAR) + " was " + str(bytes[Message.HEADER_END]))
+        if ContentBytes[Message.HEADER_END] != Message.HEADER_END_CHAR:
+            raise NotAMessageException("headers should end with " + chr(Message.HEADER_END_CHAR) + " was " + str(ContentBytes[Message.HEADER_END]))
 
 
         
-        senderMac = bytes[Message.SENDER_MAC]
-        messageType = bytes[Message.MESSAGE_TYPE]
-        contentLength = bytes[Message.CONTENT_LENGTH]
-        routeLength = bytes[Message.ROUTE_LENGTH]
+        senderMac = ContentBytes[Message.SENDER_MAC]
+        messageType = ContentBytes[Message.MESSAGE_TYPE]
+        contentLength = ContentBytes[Message.CONTENT_LENGTH]
+        routeLength = ContentBytes[Message.ROUTE_LENGTH]
         completeMessageSizeBytes = Message.HEADER_SIZE + contentLength + routeLength + 1
 
-        if len(bytes) < completeMessageSizeBytes :
+        if len(ContentBytes) < completeMessageSizeBytes :
             raise ToShortMessageException("not enough data in Buffer, perhaps not full message received")
         
-        if bytes[completeMessageSizeBytes-1] != Message.MESSAGE_END_CHAR:
+        if ContentBytes[completeMessageSizeBytes-1] != Message.MESSAGE_END_CHAR:
             raise NotAMessageException("Messages should end with " + chr(Message.MESSAGE_END_CHAR))
 
         
-        route =        bytes[Message.HEADER_SIZE              : Message.HEADER_SIZE + routeLength]
-        contentBytes = bytes[Message.HEADER_SIZE + routeLength: Message.HEADER_SIZE + routeLength + contentLength]
+        route =        ContentBytes[Message.HEADER_SIZE              : Message.HEADER_SIZE + routeLength]
+        contentBytes = ContentBytes[Message.HEADER_SIZE + routeLength: Message.HEADER_SIZE + routeLength + contentLength]
 
-        return (completeMessageSizeBytes, Message(senderMac, Route(route), messageType, contentBytes))
+        return (completeMessageSizeBytes, Message(senderMac, Route(route), messageType, bytes(contentBytes)))
 
     def test():
         contentBytes = bytes((4,5,6))

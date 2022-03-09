@@ -4,7 +4,7 @@ from meshlibrary.PymeshAdapter import PymeshAdapter
 
 class MeshFacade:
     def __init__(self, view, callback):
-        self.pma = PymeshAdapter(view, ThreadSafeLoraSocket(), PycomInterface())
+        self.pma = PymeshAdapter(view, ThreadSafeLoraSocket(), PycomInterface(), callback)
 
     def getMyAddress(self):
         return self.pma.getMyAddress()

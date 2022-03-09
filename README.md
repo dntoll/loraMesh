@@ -45,9 +45,11 @@ We would like a bash interface of shellscripts to run the common tasks
  * clean.sh - remove python cache files
  * test.sh - run tests, then clean cache files
  * OTADeploy.sh - copy files Over The Air to devices (on the same wifi), these devices IP-addresses need to be added to secrets.py
+ * simAllToAll.sh - Create a 25 node network and let them send messages to eachother, count number of messages and make sure each node got an acc from its [24-NodeID], I am getting some page-shear artifacts on this, I think due to threading and using print
+ * simSendPerformance - Create a long line of 100 nodes and count time from one end to another. ~14 s
  * simMeshTestConsole.sh - Start up a simulated network with 25 nodes in a square 
-  * Input a number [#] to send a message to that node from node 0, eg 4
-  * Input [Q] to Quit
+   * Input a number [#] to send a message to that node from node 0, eg 4
+   * Input [Q] to Quit
 
 
 

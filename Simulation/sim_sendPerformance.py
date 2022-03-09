@@ -23,7 +23,7 @@ clients = []
 views = {}
 
 
-chainLength = 10
+chainLength = 100
 for i in range(chainLength):
     
     views[i] = CompositeView()
