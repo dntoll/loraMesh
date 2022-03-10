@@ -1,11 +1,11 @@
 
 from meshlibrary.MessageChecksum import MessageChecksum
 from meshlibrary.QueItem import QueItem
+from meshlibrary.timers import *
 
 
 class SendQue:
-    MIN_WAIT_FOR_FIND = 3
-    MAX_WAIT_FOR_FIND = 20
+
 
     def __init__(self, pycomInterface):
         self.sendQue = []
@@ -14,7 +14,7 @@ class SendQue:
     def getSendQue(self):
         return self.sendQue
 
-    def receiveAcc(self, message):
+    def tryToAccMessagesInQue(self, message):
         didAcc = False
         for queItem in self.sendQue:
             if queItem.tryAcc(message):
@@ -40,6 +40,8 @@ class SendQue:
 
             sendIndex = self.pycomInterface.rng() % len(couldBeSent)
             queItem = couldBeSent[sendIndex]
+
+
             queItem.doSend(now)
             return queItem
 
@@ -74,11 +76,12 @@ class SendQue:
 
             #delay finds
             if message.isFind():
-                sendAtTime += SendQue.MIN_WAIT_FOR_FIND + self.pycomInterface.rng() % SendQue.MAX_WAIT_FOR_FIND 
+                sendAtTime += MIN_WAIT_FOR_FIND + self.pycomInterface.rng() % MAX_WAIT_FOR_FIND 
+            
 
             self.sendQue.append(QueItem(message, sendAtTime))
         else:
             if message.isFind():
                 originalMessageQueItem = self.getQueItemByMessage(message)
-                originalMessageQueItem.sendEarliestAt += SendQue.MIN_WAIT_FOR_FIND + self.pycomInterface.rng() % SendQue.MAX_WAIT_FOR_FIND 
+                originalMessageQueItem.sendEarliestAt += MIN_WAIT_FOR_FIND + self.pycomInterface.rng() % MAX_WAIT_FOR_FIND 
                 #print("Delayed find in que")

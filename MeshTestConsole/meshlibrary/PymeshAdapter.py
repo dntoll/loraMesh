@@ -6,6 +6,7 @@ from meshlibrary.Message import Message
 from meshlibrary.MeshController import MeshController
 from meshlibrary.ReceiveBuffer import ReceiveBuffer
 from meshlibrary.Route import Route
+from meshlibrary.timers import *
 
 class PymeshAdapter:
     
@@ -60,7 +61,7 @@ class PymeshAdapter:
                 lora_sock.send(queItem.message.getBytes())
                 this.view.sendMessage(queItem.message)
 
-            pycomInterface.sleep_ms(pycomInterface.rng() % 10)
+            pycomInterface.sleep_ms(pycomInterface.rng() % MAX_SLEEP_AFTER_SEND)
 
     def _listen(this, lora_sock, pycomInterface):
         while (True):
@@ -68,8 +69,9 @@ class PymeshAdapter:
             # get any data received...
             data, loraStats = lora_sock.receive()
             this.processReceivedBytes(data, loraStats)
-            # wait one second
-            pycomInterface.sleep_ms(5)
+            
+            #Maybe we can make this blocking instead...
+            pycomInterface.sleep_ms(SLEEP_AFTER_RECEIVE)
 
 
     #This is run by the receiver thread...

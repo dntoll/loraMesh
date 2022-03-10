@@ -1,8 +1,6 @@
-class QueItem:
+from meshlibrary.timers import *
 
-    WAIT_UNTIL_RESEND_MS = 10000
-    WAIT_UNTIL_REMOVE_ACCED = 6000
-    MAX_SEND_TIMES = 10
+class QueItem:
 
     def __init__(self, message, sendEarliestAt):
         self.acced = False
@@ -17,15 +15,20 @@ class QueItem:
             jumps = self.message.route.getNumberOfJumps()
 
             #delay find-messages
-            if (self.sentCount == 0 and self.sendEarliestAt < now ) or (self.sentCount > 0 and now - self.sentTime > jumps * self.WAIT_UNTIL_RESEND_MS):
-                return True
+            if self.sentCount == 0: 
+                if self.sendEarliestAt < now: 
+                    return True
+            elif self.sentCount > 0:
+                if now - self.sentTime > jumps * WAIT_UNTIL_RESEND_MS:
+                    return True
+
         return False
     
     def shouldBeRemoved(self, now):
         if self.acced == False:
             return False
         
-        if now - self.sentTime > self.WAIT_UNTIL_REMOVE_ACCED:
+        if now - self.sentTime > WAIT_UNTIL_REMOVE_ACCED:
             return True
         return False
 
@@ -42,7 +45,7 @@ class QueItem:
         if self.message.isAcc():
             self.acced = True
         
-        if self.sentCount > QueItem.MAX_SEND_TIMES:
+        if self.sentCount > MAX_SEND_TIMES:
             self.acced = True
 
         

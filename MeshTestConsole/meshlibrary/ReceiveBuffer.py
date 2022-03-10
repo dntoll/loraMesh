@@ -30,7 +30,7 @@ class ReceiveBuffer:
                 newBuffer = newBuffer[1:]
                 break
             except NotAMessageException:
-                print("not a message")
+                #print("not a message")
                 newBuffer = newBuffer[1:]
                 break
             except Exception as err:
