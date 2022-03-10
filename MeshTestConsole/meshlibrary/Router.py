@@ -10,6 +10,13 @@ class Neighbor:
         self.mac = mac
         self.rssi = rssi
         self.time = time
+        self.nodesBeyondSet = set()
+
+    def addNodesBeyond(self, route):
+        for r in route.getBytes():
+            self.nodesBeyondSet.add(r)
+
+        print(self.nodesBeyondSet)
 
 class Router:
 
@@ -29,9 +36,13 @@ class Router:
         else:
             self.neighbors[message.senderMac] = Neighbor(message.senderMac, receivedLoraStats.rssi, self.pycomInterface.ticks_ms())
         
+        verifiedRoute = message.route.getUpUntil(message.senderMac) #kan vi veta att sändaren finns med?
+
+        self.neighbors[message.senderMac].addNodesBeyond(verifiedRoute)
+        
         #Vi kan bara ha koll på den delen som går fram till oss eller sändaren, dvs verifierade router
         if message.route.notInRoute(self.myMac):
-            verifiedRoute = message.route.getUpUntil(message.senderMac) #kan vi veta att sändaren finns med?
+            
             verifiedRoute.addToEnd(self.myMac) #eftersom vi tagit emot detta så kan vi lägga till oss på slutet.
             self.routes[str(verifiedRoute.getBytes())] = verifiedRoute
         else:
