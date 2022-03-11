@@ -1,5 +1,5 @@
 
-from lib.ANSIEscape import ANSIEscape
+from ansiconsole.ANSIEscape import ANSIEscape
 import math
 
 class ValueView:

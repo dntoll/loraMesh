@@ -1,6 +1,6 @@
 #from tabnanny import check
-from lib.Console import Console
-from lib.ANSIEscape import ANSIEscape
+from ansiconsole.Console import Console
+from ansiconsole.ANSIEscape import ANSIEscape
 from meshlibrary.Message import Message
 from meshlibrary.MessageChecksum import MessageChecksum
 

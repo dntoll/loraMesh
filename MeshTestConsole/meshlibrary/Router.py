@@ -38,6 +38,7 @@ class Router:
         
         verifiedRoute = message.route.getUpUntil(message.senderMac) #kan vi veta att sändaren finns med?
 
+        
         self.neighbors[message.senderMac].addNodesBeyond(verifiedRoute)
         
         #Vi kan bara ha koll på den delen som går fram till oss eller sändaren, dvs verifierade router

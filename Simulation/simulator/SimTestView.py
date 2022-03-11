@@ -1,4 +1,4 @@
-from lib.ANSIEscape import ANSIEscape
+from ansiconsole.ANSIEscape import ANSIEscape
 
 
 class SimTestView:

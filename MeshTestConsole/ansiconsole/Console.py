@@ -7,9 +7,9 @@
 # see the Pycom Licence v1.0 document supplied with this file, or
 # available at https://www.pycom.io/opensource/licensing
 #
-from lib.ANSIEscape import ANSIEscape
-from lib.Value import Value
-from lib.ValueView import ValueView
+from ansiconsole.ANSIEscape import ANSIEscape
+from ansiconsole.Value import Value
+from ansiconsole.ValueView import ValueView
 
 
 
